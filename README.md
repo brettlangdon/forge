@@ -160,7 +160,7 @@ repo_url = domain + "/" + username + "/" + name;
 I'll probably revisit the API, I just threw it together quick, want to make sure it right.
 
 
-### Comments
+### Support for comments
 
 This is pretty lacking and should be added soon.
 
