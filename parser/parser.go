@@ -178,6 +178,7 @@ func (this *Parser) parseSetting(name string) error {
 		msg := fmt.Sprintf("expected ';' instead found '%s'", this.cur_tok.Literal)
 		return this.SyntaxError(msg)
 	}
+	this.readToken()
 
 	this.cur_section.Set(name, value)
 	return nil
@@ -221,6 +222,7 @@ func (this *Parser) Parse() error {
 				if err != nil {
 					return err
 				}
+				this.readToken()
 			} else if this.cur_tok.ID == token.EQUAL {
 				err := this.parseSetting(tok.Literal)
 				if err != nil {
@@ -232,6 +234,8 @@ func (this *Parser) Parse() error {
 			if err != nil {
 				return err
 			}
+		default:
+			return this.SyntaxError(fmt.Sprintf("unexpected token %s", tok))
 		}
 	}
 	return nil
