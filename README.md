@@ -38,6 +38,11 @@ Sections (basically a map) is formatted as the section name with the section's s
 
 ## Data types
 
+### Boolean
+A boolean value is either `true` or `false` of any case.
+
+`TRUE`, `true`, `True`, `FALSE`, `False`, `false`.
+
 ### String
 A string value is wrapped by double quotes (single quotes will not work).
 
