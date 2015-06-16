@@ -148,10 +148,6 @@ func main() {
 
 The following features are currently on my bucket list for the future:
 
-### More data types
-
-I would like to at least add `Boolean` possibly `List`
-
 ### Operations/Expressions
 
 Would be nice to have Addition/Subtraction/Multiplication/Division:
