@@ -14,11 +14,11 @@ import (
 )
 
 type Parser struct {
-	settings    config.SectionValue
+	settings    *config.SectionValue
 	tokenizer   *token.Tokenizer
 	cur_tok     token.Token
-	cur_section config.SectionValue
-	previous    []config.SectionValue
+	cur_section *config.SectionValue
+	previous    []*config.SectionValue
 }
 
 func (this *Parser) SyntaxError(msg string) error {
@@ -57,7 +57,7 @@ func (this *Parser) readToken() token.Token {
 	return this.cur_tok
 }
 
-func (this *Parser) parseReference(starting_section config.SectionValue, period bool) (config.ConfigValue, error) {
+func (this *Parser) parseReference(starting_section *config.SectionValue, period bool) (config.ConfigValue, error) {
 	names := []string{}
 	if period == false {
 		names = append(names, this.cur_tok.Literal)
@@ -98,7 +98,7 @@ func (this *Parser) parseReference(starting_section config.SectionValue, period 
 		}
 		name := names[0]
 		names = names[1:]
-		section := reference.(config.SectionValue)
+		section := reference.(*config.SectionValue)
 		if section.Contains(name) == false {
 			return nil, this.ReferenceMissingError(visited, name)
 		}
@@ -212,7 +212,6 @@ func (this *Parser) parseInclude() error {
 		this.tokenizer = token.NewTokenizer(reader)
 		this.Parse()
 	}
-	fmt.Println(this.cur_section.Includes)
 	this.tokenizer = old_tokenizer
 	this.readToken()
 	return nil
@@ -290,7 +289,7 @@ func ParseReader(reader io.Reader) (*config.SectionValue, error) {
 		tokenizer:   token.NewTokenizer(reader),
 		settings:    settings,
 		cur_section: settings,
-		previous:    make([]config.SectionValue, 0),
+		previous:    make([]*config.SectionValue, 0),
 	}
 	err := parser.Parse()
 	if err != nil {
@@ -301,5 +300,5 @@ func ParseReader(reader io.Reader) (*config.SectionValue, error) {
 		return nil, parser.SyntaxError("expected end of section, instead found EOF")
 	}
 
-	return &settings, nil
+	return settings, nil
 }
