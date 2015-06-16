@@ -25,6 +25,10 @@ func isBoolean(str string) bool {
 	return lower == "true" || lower == "false"
 }
 
+func isNull(str string) bool {
+	return strings.ToLower(str) == "null"
+}
+
 type Tokenizer struct {
 	cur_line int
 	cur_col  int
@@ -80,6 +84,8 @@ func (this *Tokenizer) parseIdentifier() {
 
 	if isBoolean(this.cur_tok.Literal) {
 		this.cur_tok.ID = BOOLEAN
+	} else if isNull(this.cur_tok.Literal) {
+		this.cur_tok.ID = NULL
 	}
 }
 

@@ -43,6 +43,12 @@ A boolean value is either `true` or `false` of any case.
 
 `TRUE`, `true`, `True`, `FALSE`, `False`, `false`.
 
+### Null
+
+A null value is allowed as `null` of any case.
+
+`NULL`, `Null`, `null`.
+
 ### String
 A string value is wrapped by double quotes (single quotes will not work).
 

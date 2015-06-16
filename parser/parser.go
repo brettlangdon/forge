@@ -128,6 +128,11 @@ func (this *Parser) parseSetting(name string) error {
 			Name:  name,
 			Value: bool_val,
 		}
+	case token.NULL:
+		value = config.NullValue{
+			Name:  name,
+			Value: nil,
+		}
 	case token.INTEGER:
 		int_val, err := strconv.ParseInt(this.cur_tok.Literal, 10, 64)
 		if err != nil {

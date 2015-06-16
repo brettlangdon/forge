@@ -8,6 +8,7 @@ const (
 	BOOLEAN
 	FLOAT
 	STRING
+	NULL
 )
 
 var configTypes = [...]string{
@@ -16,6 +17,7 @@ var configTypes = [...]string{
 	INTEGER: "INTEGER",
 	FLOAT:   "FLOAT",
 	STRING:  "STRING",
+	NULL:    "NULL",
 }
 
 func (this ConfigType) String() string {
@@ -43,6 +45,14 @@ type BooleanValue struct {
 
 func (this BooleanValue) GetType() ConfigType   { return BOOLEAN }
 func (this BooleanValue) GetValue() interface{} { return this.Value }
+
+type NullValue struct {
+	Name  string
+	Value interface{}
+}
+
+func (this NullValue) GetType() ConfigType   { return NULL }
+func (this NullValue) GetValue() interface{} { return nil }
 
 type IntegerValue struct {
 	Name  string
