@@ -8,6 +8,21 @@ type SectionValue struct {
 	Comments []string
 }
 
+func NewNamedSection(name string) SectionValue {
+	return SectionValue{
+		Name:     name,
+		Value:    make(map[string]ConfigValue),
+		Comments: make([]string, 0),
+	}
+}
+
+func NewAnonymousSection() SectionValue {
+	return SectionValue{
+		Value:    make(map[string]ConfigValue),
+		Comments: make([]string, 0),
+	}
+}
+
 func (this SectionValue) GetType() ConfigType   { return SECTION }
 func (this SectionValue) GetValue() interface{} { return this.Value }
 

@@ -185,11 +185,7 @@ func (this *Parser) parseSetting(name string) error {
 }
 
 func (this *Parser) parseSection(name string) error {
-	section := config.SectionValue{
-		Name:     name,
-		Value:    make(map[string]config.ConfigValue),
-		Comments: make([]string, 0),
-	}
+	section := config.NewNamedSection(name)
 	this.cur_section.Set(name, section)
 	this.previous = append(this.previous, this.cur_section)
 	this.cur_section = section
@@ -253,10 +249,7 @@ func ParseFile(filename string) (settings *config.SectionValue, err error) {
 }
 
 func ParseReader(reader io.Reader) (*config.SectionValue, error) {
-	settings := config.SectionValue{
-		Value:    make(map[string]config.ConfigValue),
-		Comments: make([]string, 0),
-	}
+	settings := config.NewAnonymousSection()
 	parser := &Parser{
 		tokenizer:   token.NewTokenizer(reader),
 		settings:    settings,
