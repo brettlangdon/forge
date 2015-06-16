@@ -5,6 +5,8 @@ forge
 
 Forge is a configuration syntax and parser.
 
+**Note:** This is still under active development, please report any issues or feature requests.
+
 ## Installation
 
 `git get github.com/brettlangdon/forge`
