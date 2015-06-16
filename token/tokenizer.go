@@ -3,6 +3,7 @@ package token
 import (
 	"bufio"
 	"io"
+	"strings"
 )
 
 var eof = rune(0)
@@ -17,6 +18,11 @@ func isDigit(ch rune) bool {
 
 func isWhitespace(ch rune) bool {
 	return (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+}
+
+func isBoolean(str string) bool {
+	lower := strings.ToLower(str)
+	return lower == "true" || lower == "false"
 }
 
 type Tokenizer struct {
@@ -70,6 +76,10 @@ func (this *Tokenizer) parseIdentifier() {
 			break
 		}
 		this.cur_tok.Literal += string(this.cur_ch)
+	}
+
+	if isBoolean(this.cur_tok.Literal) {
+		this.cur_tok.ID = BOOLEAN
 	}
 }
 

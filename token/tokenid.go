@@ -13,6 +13,7 @@ const (
 	PERIOD
 
 	IDENTIFIER
+	BOOLEAN
 	INTEGER
 	FLOAT
 	STRING
@@ -27,6 +28,7 @@ var tokenNames = [...]string{
 	SEMICOLON:  "SEMICOLON",
 	PERIOD:     "PERIOD",
 	IDENTIFIER: "IDENTIFIER",
+	BOOLEAN:    "BOOLEAN",
 	INTEGER:    "INTEGER",
 	FLOAT:      "FLOAT",
 	STRING:     "STRING",

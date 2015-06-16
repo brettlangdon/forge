@@ -5,12 +5,14 @@ type ConfigType int
 const (
 	SECTION ConfigType = iota
 	INTEGER
+	BOOLEAN
 	FLOAT
 	STRING
 )
 
 var configTypes = [...]string{
 	SECTION: "SECTION",
+	BOOLEAN: "BOOLEAN",
 	INTEGER: "INTEGER",
 	FLOAT:   "FLOAT",
 	STRING:  "STRING",
@@ -33,6 +35,14 @@ type ConfigValue interface {
 	GetType() ConfigType
 	GetValue() interface{}
 }
+
+type BooleanValue struct {
+	Name  string
+	Value bool
+}
+
+func (this BooleanValue) GetType() ConfigType   { return BOOLEAN }
+func (this BooleanValue) GetValue() interface{} { return this.Value }
 
 type IntegerValue struct {
 	Name  string

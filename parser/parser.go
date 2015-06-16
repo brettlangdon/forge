@@ -119,6 +119,15 @@ func (this *Parser) parseSetting(name string) error {
 			Name:  name,
 			Value: this.cur_tok.Literal,
 		}
+	case token.BOOLEAN:
+		bool_val, err := strconv.ParseBool(this.cur_tok.Literal)
+		if err != nil {
+			return nil
+		}
+		value = config.BooleanValue{
+			Name:  name,
+			Value: bool_val,
+		}
 	case token.INTEGER:
 		int_val, err := strconv.ParseInt(this.cur_tok.Literal, 10, 64)
 		if err != nil {
