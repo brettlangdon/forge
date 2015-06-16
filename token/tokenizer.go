@@ -29,6 +29,10 @@ func isNull(str string) bool {
 	return strings.ToLower(str) == "null"
 }
 
+func isInclude(str string) bool {
+	return strings.ToLower(str) == "include"
+}
+
 type Tokenizer struct {
 	cur_line int
 	cur_col  int
@@ -86,6 +90,8 @@ func (this *Tokenizer) parseIdentifier() {
 		this.cur_tok.ID = BOOLEAN
 	} else if isNull(this.cur_tok.Literal) {
 		this.cur_tok.ID = NULL
+	} else if isInclude(this.cur_tok.Literal) {
+		this.cur_tok.ID = INCLUDE
 	}
 }
 

@@ -19,6 +19,7 @@ const (
 	STRING
 	NULL
 	COMMENT
+	INCLUDE
 )
 
 var tokenNames = [...]string{
@@ -36,6 +37,7 @@ var tokenNames = [...]string{
 	STRING:     "STRING",
 	NULL:       "NULL",
 	COMMENT:    "COMMENT",
+	INCLUDE:    "INCLUDE",
 }
 
 func (this TokenID) String() string {

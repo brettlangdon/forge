@@ -6,6 +6,7 @@ type SectionValue struct {
 	Name     string
 	Value    map[string]ConfigValue
 	Comments []string
+	Includes []string
 }
 
 func NewNamedSection(name string) SectionValue {
@@ -13,6 +14,7 @@ func NewNamedSection(name string) SectionValue {
 		Name:     name,
 		Value:    make(map[string]ConfigValue),
 		Comments: make([]string, 0),
+		Includes: make([]string, 0),
 	}
 }
 
@@ -20,6 +22,7 @@ func NewAnonymousSection() SectionValue {
 	return SectionValue{
 		Value:    make(map[string]ConfigValue),
 		Comments: make([]string, 0),
+		Includes: make([]string, 0),
 	}
 }
 
@@ -28,6 +31,10 @@ func (this SectionValue) GetValue() interface{} { return this.Value }
 
 func (this SectionValue) AddComment(comment string) {
 	this.Comments = append(this.Comments, comment)
+}
+
+func (this SectionValue) AddInclude(include string) {
+	this.Includes = append(this.Includes, include)
 }
 
 func (this SectionValue) Set(name string, value ConfigValue) {

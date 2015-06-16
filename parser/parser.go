@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -167,7 +168,7 @@ func (this *Parser) parseSetting(name string) error {
 		read_next = false
 	default:
 		return this.SyntaxError(
-			fmt.Sprintf("expected STRING, INTEGER or FLOAT, instead found %s", this.cur_tok.ID),
+			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", this.cur_tok.ID),
 		)
 	}
 
@@ -181,6 +182,39 @@ func (this *Parser) parseSetting(name string) error {
 	this.readToken()
 
 	this.cur_section.Set(name, value)
+	return nil
+}
+
+func (this *Parser) parseInclude() error {
+	if this.cur_tok.ID != token.STRING {
+		msg := fmt.Sprintf("expected STRING instead found '%s'", this.cur_tok.ID)
+		return this.SyntaxError(msg)
+	}
+	pattern := this.cur_tok.Literal
+
+	this.readToken()
+	if this.cur_tok.ID != token.SEMICOLON {
+		msg := fmt.Sprintf("expected ';' instead found '%s'", this.cur_tok.Literal)
+		return this.SyntaxError(msg)
+	}
+
+	filenames, err := filepath.Glob(pattern)
+	if err != nil {
+		return err
+	}
+	old_tokenizer := this.tokenizer
+	for _, filename := range filenames {
+		reader, err := os.Open(filename)
+		if err != nil {
+			return err
+		}
+		this.cur_section.AddInclude(filename)
+		this.tokenizer = token.NewTokenizer(reader)
+		this.Parse()
+	}
+	fmt.Println(this.cur_section.Includes)
+	this.tokenizer = old_tokenizer
+	this.readToken()
 	return nil
 }
 
@@ -215,6 +249,8 @@ func (this *Parser) Parse() error {
 		switch tok.ID {
 		case token.COMMENT:
 			this.cur_section.AddComment(tok.Literal)
+		case token.INCLUDE:
+			this.parseInclude()
 		case token.IDENTIFIER:
 			if this.cur_tok.ID == token.LBRACKET {
 				err := this.parseSection(tok.Literal)

@@ -32,6 +32,8 @@ second {
   key = "value";
   global_reference = sub_settings.sub_float;
   local_reference = .key;  # References second.key
+
+  include "/path/to/other/settings/*.cfg";
 }
 ```
 
@@ -42,6 +44,11 @@ Sections (basically a map) is formatted as the section name with the section's s
 `<section> { <key> = <value>; }`
 
 Comments start with a pound sign `#` and end with a newline. A comment can exist on the same line as settings/sections, but the comment must end the line.
+
+Includes are allowed simply by using the directive `include` followed by a string pointing to the location of the file(s) you want to include.
+`include` uses go's [filepath.Match](http://golang.org/pkg/path/filepath/#Glob) functionality to find all files matching the provided pattern.
+Each file is included directly where it's `include` statement is called from.
+`include "/etc/app/*.cfg";`
 
 ## Data types
 
