@@ -18,6 +18,7 @@ const (
 	FLOAT
 	STRING
 	NULL
+	COMMENT
 )
 
 var tokenNames = [...]string{
@@ -34,6 +35,7 @@ var tokenNames = [...]string{
 	FLOAT:      "FLOAT",
 	STRING:     "STRING",
 	NULL:       "NULL",
+	COMMENT:    "COMMENT",
 }
 
 func (this TokenID) String() string {

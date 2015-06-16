@@ -12,10 +12,14 @@ Forge is a configuration syntax and parser.
 The format was influenced a lot by nginx configuration file format.
 
 ```config
+# Global settings
 global_key = "string value";
+
+# Sub section
 sub_settings {
   sub_int = 500;
   sub_float = 80.80;
+  # Sub-Sub Section
   sub_sub_settings {
     sub_sub_sub_settings {
       key = "value";
@@ -23,10 +27,11 @@ sub_settings {
   }
 }
 
+# Second section
 second {
   key = "value";
   global_reference = sub_settings.sub_float;
-  local_reference = .key;
+  local_reference = .key;  # References second.key
 }
 ```
 
@@ -35,6 +40,8 @@ For normal settings the format is the key followed by an equal sign followed by 
 
 Sections (basically a map) is formatted as the section name with the section's settings wrapped in brackets.
 `<section> { <key> = <value>; }`
+
+Comments start with a pound sign `#` and end with a newline. A comment can exist on the same line as settings/sections, but the comment must end the line.
 
 ## Data types
 
@@ -169,11 +176,6 @@ repo_url = domain + "/" + username + "/" + name;
 ### API
 
 I'll probably revisit the API, I just threw it together quick, want to make sure it right.
-
-
-### Support for comments
-
-This is pretty lacking and should be added soon.
 
 ### Documentation
 

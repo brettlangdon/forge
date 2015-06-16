@@ -186,8 +186,9 @@ func (this *Parser) parseSetting(name string) error {
 
 func (this *Parser) parseSection(name string) error {
 	section := config.SectionValue{
-		Name:  name,
-		Value: make(map[string]config.ConfigValue),
+		Name:     name,
+		Value:    make(map[string]config.ConfigValue),
+		Comments: make([]string, 0),
 	}
 	this.cur_section.Set(name, section)
 	this.previous = append(this.previous, this.cur_section)
@@ -216,6 +217,8 @@ func (this *Parser) Parse() error {
 		tok := this.cur_tok
 		this.readToken()
 		switch tok.ID {
+		case token.COMMENT:
+			this.cur_section.AddComment(tok.Literal)
 		case token.IDENTIFIER:
 			if this.cur_tok.ID == token.LBRACKET {
 				err := this.parseSection(tok.Literal)
@@ -251,7 +254,8 @@ func ParseFile(filename string) (settings *config.SectionValue, err error) {
 
 func ParseReader(reader io.Reader) (*config.SectionValue, error) {
 	settings := config.SectionValue{
-		Value: make(map[string]config.ConfigValue),
+		Value:    make(map[string]config.ConfigValue),
+		Comments: make([]string, 0),
 	}
 	parser := &Parser{
 		tokenizer:   token.NewTokenizer(reader),

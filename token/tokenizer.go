@@ -118,6 +118,19 @@ func (this *Tokenizer) parseString() {
 	this.readRune()
 }
 
+func (this *Tokenizer) parseComment() {
+	this.cur_tok.ID = COMMENT
+	this.cur_tok.Literal = ""
+	for {
+		this.readRune()
+		if this.cur_ch == '\n' {
+			break
+		}
+		this.cur_tok.Literal += string(this.cur_ch)
+	}
+	this.readRune()
+}
+
 func (this *Tokenizer) skipWhitespace() {
 	for {
 		this.readRune()
@@ -144,6 +157,8 @@ func (this *Tokenizer) NextToken() Token {
 		this.parseIdentifier()
 	case isDigit(ch):
 		this.parseNumber()
+	case ch == '#':
+		this.parseComment()
 	case ch == eof:
 		this.cur_tok.ID = EOF
 		this.cur_tok.Literal = "EOF"

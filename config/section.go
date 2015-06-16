@@ -3,12 +3,17 @@ package config
 import "encoding/json"
 
 type SectionValue struct {
-	Name  string
-	Value map[string]ConfigValue
+	Name     string
+	Value    map[string]ConfigValue
+	Comments []string
 }
 
 func (this SectionValue) GetType() ConfigType   { return SECTION }
 func (this SectionValue) GetValue() interface{} { return this.Value }
+
+func (this SectionValue) AddComment(comment string) {
+	this.Comments = append(this.Comments, comment)
+}
 
 func (this SectionValue) Set(name string, value ConfigValue) {
 	this.Value[name] = value
