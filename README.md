@@ -1,6 +1,8 @@
 forge
 =====
 
+[![GoDoc](https://godoc.org/github.com/brettlangdon/forge?status.svg)](https://godoc.org/github.com/brettlangdon/forge)
+
 Forge is a configuration syntax and parser.
 
 ## Installation
