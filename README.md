@@ -5,127 +5,48 @@ forge
 
 Forge is a configuration syntax and parser.
 
-**Note:** This is still under active development, please report any issues or feature requests.
-
 ## Installation
 
 `git get github.com/brettlangdon/forge`
 
-## File format
+## Documentation
 
-The format was influenced a lot by nginx configuration file format.
-
-```config
-# Global settings
-global_key = "string value";
-
-# Sub section
-sub_settings {
-  sub_int = 500;
-  sub_float = 80.80;
-  # Sub-Sub Section
-  sub_sub_settings {
-    sub_sub_sub_settings {
-      key = "value";
-    }
-  }
-}
-
-# Second section
-second {
-  key = "value";
-  global_reference = sub_settings.sub_float;
-  local_reference = .key;  # References second.key
-
-  include "/path/to/other/settings/*.cfg";
-}
-```
-
-For normal settings the format is the key followed by an equal sign followed by the value and lastly ending with a semicolon.
-`<key> = <value>;`
-
-Sections (basically a map) is formatted as the section name with the section's settings wrapped in brackets.
-`<section> { <key> = <value>; }`
-
-Comments start with a pound sign `#` and end with a newline. A comment can exist on the same line as settings/sections, but the comment must end the line.
-
-Includes are allowed simply by using the directive `include` followed by a string pointing to the location of the file(s) you want to include.
-`include` uses go's [filepath.Match](http://golang.org/pkg/path/filepath/#Glob) functionality to find all files matching the provided pattern.
-Each file is included directly where it's `include` statement is called from.
-`include "/etc/app/*.cfg";`
-
-## Data types
-
-### Boolean
-A boolean value is either `true` or `false` of any case.
-
-`TRUE`, `true`, `True`, `FALSE`, `False`, `false`.
-
-### Null
-
-A null value is allowed as `null` of any case.
-
-`NULL`, `Null`, `null`.
-
-### String
-A string value is wrapped by double quotes (single quotes will not work).
-
-`"string value"`, `"single ' quotes ' allowed"`.
-
-As of right now there is no way to escape double quotes within a string's value;
-
-### Number
-
-There are two supported numbers, Integer and Float, both of which are simply numbers with the later having one period.
-
-`500`, `50.56`.
-
-### Section
-
-Sections are essentially maps, that is a setting whose purpose is to hold other settings.
-Sections can be used to namespace settings.
-
-`section { setting = "value"; }`.
-
-
-### References
-
-References are used to refer to previously defined settings. There are two kinds of references, a global reference and a local reference;
-
-The general format for a reference is a mix of identifiers and periods, for example `production.db.name`.
-
-A global reference is a reference which starts looking for its value from the top most section (global section).
-
-A local reference is a reference whose value starts with a period, this reference will start looking for it's value from the current section it is within (local section).
-
-```config
-production {
-  db {
-    name = "forge";
-  }
-}
-
-development {
-  db {
-    name = production.db.name;
-  }
-  db_name = .db.name;
-}
-```
-
-## API
-
-`github.com/brettlangdon/forge`
-
-* `forge.ParseString(data string) (map[string]interface{}, error)`
-* `forge.ParseBytes(data []byte) (map[string]interface{}, error)`
-* `forge.ParseFile(filename string) (map[string]interface{}, error)`
-* `forge.ParseReader(reader io.Reader) (map[string]interface{}, error)`
-
+Documentation can be viewed on godoc: https://godoc.org/github.com/brettlangdon/forge
 
 ## Example
 
 You can see example usage in the `example` folder.
+
+``cfg
+# example.cfg
+
+# Global directives
+global = "global value";
+# Primary section
+primary {
+  string = "primary string value";
+  integer = 500;
+  float = 80.80;
+  boolean = true;
+  negative = FALSE;
+  nothing = NULL;
+  # Include external files
+  include "./include*.cfg";
+  # Primary-sub section
+  sub {
+      key = "primary sub key value";
+  }
+}
+
+# Secondary section
+secondary {
+  another = "secondary another value";
+  global_reference = global;
+  primary_sub_key = primary.sub.key;
+  another_again = .another;  # References secondary.another
+  _under = 50;
+}
+```
 
 ```go
 package main
@@ -138,52 +59,38 @@ import (
 )
 
 func main() {
-	// Parse the file `example.cfg` as a map[string]interface{}
+	// Parse a `SectionValue` from `example.cfg`
 	settings, err := forge.ParseFile("example.cfg")
 	if err != nil {
 		panic(err)
 	}
 
-	// Convert the settings to JSON for printing
-	jsonBytes, err := json.Marshal(settings)
-	if err != nil {
-		panic(err)
+	// Get a single value
+	if settings.Contains("global") {
+		// Get `global` casted as `StringValue`
+		value := settings.GetString("global")
+		fmt.Printf("global = \"%s\"\r\n", value.GetValue())
 	}
 
-	// Print the parsed settings
-	fmt.Println(string(jsonBytes))
+	// Get a nested value
+	value, err := settings.Resolve("primary.included_setting")
+	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
+
+	// You can also traverse down the sections
+	primary, err := settings.GetSection("primary")
+	value, err := primary.GetString("included_setting")
+	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
+
+	// Convert settings to a map
+	settingsMap, err := settings.ToMap()
+	fmt.Printf("global = \"%s\"\r\n", settingsMap["global"])
+
+	// Convert settings to JSON
+	jsonBytes, err := settings.ToJSON()
+	fmt.Printf("\r\n\r\n%s\r\n", string(jsonBytes))
 }
 ```
 
-## Future Plans
+## Issues/Requests?
 
-The following features are currently on my bucket list for the future:
-
-### Operations/Expressions
-
-Would be nice to have Addition/Subtraction/Multiplication/Division:
-
-```config
-whole = 100
-half = whole / 2;
-double = whole * 2;
-one_more = whole + 1;
-one_less = whole - 1;
-```
-
-Also Concatenation for strings:
-
-```config
-domain = "github.com";
-username = "brettlangdon";
-name = "forge";
-repo_url = domain + "/" + username + "/" + name;
-```
-
-### API
-
-I'll probably revisit the API, I just threw it together quick, want to make sure it right.
-
-### Documentation
-
-Documentation is a good thing.
+Please feel free to open a github issue for any issues you have or any feature requests.

@@ -25,6 +25,11 @@ func Example() {
 	value, err := settings.Resolve("primary.included_setting")
 	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
 
+	// You can also traverse down the sections manually
+	primary, err := settings.GetSection("primary")
+	value, err := primary.GetString("included_setting")
+	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
+
 	// Convert settings to a map
 	settingsMap, err := settings.ToMap()
 	fmt.Printf("global = \"%s\"\r\n", settingsMap["global"])
