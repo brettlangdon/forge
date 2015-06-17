@@ -89,18 +89,22 @@ import (
 	"github.com/brettlangdon/forge/parser"
 )
 
+// Parse a forge SectionValue from a string
 func ParseString(data string) (*config.SectionValue, error) {
 	return parser.ParseReader(strings.NewReader(data))
 }
 
+// Parse a forge SectionValue from a byte array
 func ParseBytes(data []byte) (*config.SectionValue, error) {
 	return parser.ParseReader(bytes.NewReader(data))
 }
 
+// Parse a forge SectionValue from a filename
 func ParseFile(filename string) (*config.SectionValue, error) {
 	return parser.ParseFile(filename)
 }
 
+// Parse a forge SectionValue from a io.Reader
 func ParseReader(reader io.Reader) (*config.SectionValue, error) {
 	return parser.ParseReader(reader)
 }
