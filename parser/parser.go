@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/brettlangdon/forge/config"
 	"github.com/brettlangdon/forge/token"
@@ -31,43 +30,25 @@ func (this *Parser) SyntaxError(msg string) error {
 	return errors.New(msg)
 }
 
-func (this *Parser) ReferenceTypeError(names []string, expected config.ConfigType, actual config.ConfigType) error {
-	reference := strings.Join(names, ".")
-	msg := fmt.Sprintf(
-		"Reference type error, '%s', expected type %s instead got %s",
-		reference,
-		expected,
-		actual,
-	)
-	return errors.New(msg)
-}
-
-func (this *Parser) ReferenceMissingError(names []string, searching string) error {
-	reference := strings.Join(names, ".")
-	msg := fmt.Sprintf(
-		"Reference missing error, '%s' does not have key '%s'",
-		reference,
-		searching,
-	)
-	return errors.New(msg)
-}
-
 func (this *Parser) readToken() token.Token {
 	this.cur_tok = this.tokenizer.NextToken()
 	return this.cur_tok
 }
 
 func (this *Parser) parseReference(starting_section *config.SectionValue, period bool) (config.ConfigValue, error) {
-	names := []string{}
+	name := ""
 	if period == false {
-		names = append(names, this.cur_tok.Literal)
+		name = this.cur_tok.Literal
 	}
 	for {
 		this.readToken()
 		if this.cur_tok.ID == token.PERIOD && period == false {
 			period = true
 		} else if period && this.cur_tok.ID == token.IDENTIFIER {
-			names = append(names, this.cur_tok.Literal)
+			if len(name) > 0 {
+				name += "."
+			}
+			name += this.cur_tok.Literal
 			period = false
 		} else if this.cur_tok.ID == token.SEMICOLON {
 			break
@@ -76,7 +57,7 @@ func (this *Parser) parseReference(starting_section *config.SectionValue, period
 			return nil, this.SyntaxError(msg)
 		}
 	}
-	if len(names) == 0 {
+	if len(name) == 0 {
 		return nil, this.SyntaxError(
 			fmt.Sprintf("expected IDENTIFIER instead found %s", this.cur_tok.Literal),
 		)
@@ -86,27 +67,11 @@ func (this *Parser) parseReference(starting_section *config.SectionValue, period
 		return nil, this.SyntaxError(fmt.Sprintf("expected IDENTIFIER after PERIOD"))
 	}
 
-	var reference config.ConfigValue
-	reference = starting_section
-	visited := []string{}
-	for {
-		if len(names) == 0 {
-			break
-		}
-		if reference.GetType() != config.SECTION {
-			return nil, this.ReferenceTypeError(visited, config.SECTION, reference.GetType())
-		}
-		name := names[0]
-		names = names[1:]
-		section := reference.(*config.SectionValue)
-		if section.Contains(name) == false {
-			return nil, this.ReferenceMissingError(visited, name)
-		}
-		reference = section.Get(name)
-		visited = append(visited, name)
+	value, err := starting_section.Resolve(name)
+	if err != nil {
+		err = errors.New("Reference error, " + err.Error())
 	}
-
-	return reference, nil
+	return value, err
 }
 
 func (this *Parser) parseSetting(name string) error {

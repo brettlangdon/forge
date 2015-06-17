@@ -1,6 +1,11 @@
 package config
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"strings"
+)
 
 type SectionValue struct {
 	Name     string
@@ -68,6 +73,37 @@ func (this *SectionValue) GetFloat(name string) FloatValue {
 func (this *SectionValue) Contains(name string) bool {
 	_, ok := this.Value[name]
 	return ok
+}
+
+func (this *SectionValue) Resolve(setting string) (ConfigValue, error) {
+	parts := strings.Split(setting, ".")
+	var reference ConfigValue
+	reference = this
+	visited := []string{}
+	for {
+		if len(parts) == 0 {
+			break
+		}
+		if reference.GetType() != SECTION {
+			name := strings.Join(visited, ".")
+			return nil, errors.New(fmt.Sprintf("'%s' is a %s not a SECTION", name, reference.GetType()))
+		}
+		part := parts[0]
+		parts = parts[1:]
+		section := reference.(*SectionValue)
+		if section.Contains(part) == false {
+			name := strings.Join(visited, ".")
+			if len(name) > 0 {
+				return nil, errors.New(fmt.Sprintf("'%s' does not have setting '%s'", name, part))
+			} else {
+				return nil, errors.New(fmt.Sprintf("setting '%s' does not exist", part))
+			}
+		}
+		reference = section.Get(part)
+		visited = append(visited, part)
+	}
+
+	return reference, nil
 }
 
 func (this *SectionValue) ToJSON() ([]byte, error) {
