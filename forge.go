@@ -1,4 +1,4 @@
-// Forge configuration file format and parser.
+// Package forge provides an api to deal with parsing configuration files
 //
 // Config file example:
 //
