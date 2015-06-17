@@ -1,4 +1,4 @@
-package configTypes
+package config
 
 type StringValue struct {
 	Name  string
