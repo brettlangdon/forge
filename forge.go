@@ -1,4 +1,4 @@
-// Package forge provides an api to deal with parsing configuration files
+// Package forge provides an api to deal with parsing configuration files.
 //
 // Config file example:
 //
