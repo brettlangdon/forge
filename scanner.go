@@ -35,6 +35,8 @@ func isInclude(str string) bool {
 	return strings.ToLower(str) == "include"
 }
 
+// Scanner struct used to hold data necessary for parsing tokens
+// from the input reader
 type Scanner struct {
 	curLine int
 	curCol  int
@@ -44,6 +46,7 @@ type Scanner struct {
 	reader  *bufio.Reader
 }
 
+// NewScanner creates and initializes a new *Scanner from an io.Readerx
 func NewScanner(reader io.Reader) *Scanner {
 	scanner := &Scanner{
 		reader:  bufio.NewReader(reader),
@@ -148,6 +151,7 @@ func (scanner *Scanner) skipWhitespace() {
 	}
 }
 
+// NextToken will read in the next valid token from the Scanner
 func (scanner *Scanner) NextToken() token.Token {
 	if isWhitespace(scanner.curCh) {
 		scanner.skipWhitespace()
