@@ -29,51 +29,51 @@ func NewParser(reader io.Reader) *Parser {
 	}
 }
 
-func (this *Parser) syntaxError(msg string) error {
+func (parser *Parser) syntaxError(msg string) error {
 	msg = fmt.Sprintf(
 		"Syntax error line <%d> column <%d>: %s",
-		this.curTok.Line,
-		this.curTok.Column,
+		parser.curTok.Line,
+		parser.curTok.Column,
 		msg,
 	)
 	return errors.New(msg)
 }
 
-func (this *Parser) readToken() token.Token {
-	this.curTok = this.scanner.NextToken()
-	return this.curTok
+func (parser *Parser) readToken() token.Token {
+	parser.curTok = parser.scanner.NextToken()
+	return parser.curTok
 }
 
-func (this *Parser) parseReference(startingSection *Section, period bool) (Value, error) {
+func (parser *Parser) parseReference(startingSection *Section, period bool) (Value, error) {
 	name := ""
 	if period == false {
-		name = this.curTok.Literal
+		name = parser.curTok.Literal
 	}
 	for {
-		this.readToken()
-		if this.curTok.ID == token.PERIOD && period == false {
+		parser.readToken()
+		if parser.curTok.ID == token.PERIOD && period == false {
 			period = true
-		} else if period && this.curTok.ID == token.IDENTIFIER {
+		} else if period && parser.curTok.ID == token.IDENTIFIER {
 			if len(name) > 0 {
 				name += "."
 			}
-			name += this.curTok.Literal
+			name += parser.curTok.Literal
 			period = false
-		} else if this.curTok.ID == token.SEMICOLON {
+		} else if parser.curTok.ID == token.SEMICOLON {
 			break
 		} else {
-			msg := fmt.Sprintf("expected ';' instead found '%s'", this.curTok.Literal)
-			return nil, this.syntaxError(msg)
+			msg := fmt.Sprintf("expected ';' instead found '%s'", parser.curTok.Literal)
+			return nil, parser.syntaxError(msg)
 		}
 	}
 	if len(name) == 0 {
-		return nil, this.syntaxError(
-			fmt.Sprintf("expected IDENTIFIER instead found %s", this.curTok.Literal),
+		return nil, parser.syntaxError(
+			fmt.Sprintf("expected IDENTIFIER instead found %s", parser.curTok.Literal),
 		)
 	}
 
 	if period {
-		return nil, this.syntaxError(fmt.Sprintf("expected IDENTIFIER after PERIOD"))
+		return nil, parser.syntaxError(fmt.Sprintf("expected IDENTIFIER after PERIOD"))
 	}
 
 	value, err := startingSection.Resolve(name)
@@ -83,16 +83,16 @@ func (this *Parser) parseReference(startingSection *Section, period bool) (Value
 	return value, nil
 }
 
-func (this *Parser) parseSetting(name string) error {
+func (parser *Parser) parseSetting(name string) error {
 	var value Value
-	this.readToken()
+	parser.readToken()
 
 	read_next := true
-	switch this.curTok.ID {
+	switch parser.curTok.ID {
 	case token.STRING:
-		value = NewString(this.curTok.Literal)
+		value = NewString(parser.curTok.Literal)
 	case token.BOOLEAN:
-		boolVal, err := strconv.ParseBool(this.curTok.Literal)
+		boolVal, err := strconv.ParseBool(parser.curTok.Literal)
 		if err != nil {
 			return nil
 		}
@@ -100,151 +100,151 @@ func (this *Parser) parseSetting(name string) error {
 	case token.NULL:
 		value = NewNull()
 	case token.INTEGER:
-		intVal, err := strconv.ParseInt(this.curTok.Literal, 10, 64)
+		intVal, err := strconv.ParseInt(parser.curTok.Literal, 10, 64)
 		if err != nil {
 			return err
 		}
 		value = NewInteger(intVal)
 	case token.FLOAT:
-		floatVal, err := strconv.ParseFloat(this.curTok.Literal, 64)
+		floatVal, err := strconv.ParseFloat(parser.curTok.Literal, 64)
 		if err != nil {
 			return err
 		}
 		value = NewFloat(floatVal)
 	case token.PERIOD:
-		reference, err := this.parseReference(this.curSection, true)
+		reference, err := parser.parseReference(parser.curSection, true)
 		if err != nil {
 			return err
 		}
 		value = reference
 		read_next = false
 	case token.IDENTIFIER:
-		reference, err := this.parseReference(this.settings, false)
+		reference, err := parser.parseReference(parser.settings, false)
 		if err != nil {
 			return err
 		}
 		value = reference
 		read_next = false
 	default:
-		return this.syntaxError(
-			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", this.curTok.ID),
+		return parser.syntaxError(
+			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", parser.curTok.ID),
 		)
 	}
 
 	if read_next {
-		this.readToken()
+		parser.readToken()
 	}
-	if this.curTok.ID != token.SEMICOLON {
-		msg := fmt.Sprintf("expected ';' instead found '%s'", this.curTok.Literal)
-		return this.syntaxError(msg)
+	if parser.curTok.ID != token.SEMICOLON {
+		msg := fmt.Sprintf("expected ';' instead found '%s'", parser.curTok.Literal)
+		return parser.syntaxError(msg)
 	}
-	this.readToken()
+	parser.readToken()
 
-	this.curSection.Set(name, value)
+	parser.curSection.Set(name, value)
 	return nil
 }
 
-func (this *Parser) parseInclude() error {
-	if this.curTok.ID != token.STRING {
-		msg := fmt.Sprintf("expected STRING instead found '%s'", this.curTok.ID)
-		return this.syntaxError(msg)
+func (parser *Parser) parseInclude() error {
+	if parser.curTok.ID != token.STRING {
+		msg := fmt.Sprintf("expected STRING instead found '%s'", parser.curTok.ID)
+		return parser.syntaxError(msg)
 	}
-	pattern := this.curTok.Literal
+	pattern := parser.curTok.Literal
 
-	this.readToken()
-	if this.curTok.ID != token.SEMICOLON {
-		msg := fmt.Sprintf("expected ';' instead found '%s'", this.curTok.Literal)
-		return this.syntaxError(msg)
+	parser.readToken()
+	if parser.curTok.ID != token.SEMICOLON {
+		msg := fmt.Sprintf("expected ';' instead found '%s'", parser.curTok.Literal)
+		return parser.syntaxError(msg)
 	}
 
 	filenames, err := filepath.Glob(pattern)
 	if err != nil {
 		return err
 	}
-	oldScanner := this.scanner
+	oldScanner := parser.scanner
 	for _, filename := range filenames {
 		reader, err := os.Open(filename)
 		if err != nil {
 			return err
 		}
-		// this.curSection.AddInclude(filename)
-		this.scanner = NewScanner(reader)
-		this.parse()
+		// parser.curSection.AddInclude(filename)
+		parser.scanner = NewScanner(reader)
+		parser.parse()
 	}
-	this.scanner = oldScanner
-	this.readToken()
+	parser.scanner = oldScanner
+	parser.readToken()
 	return nil
 }
 
-func (this *Parser) parseSection(name string) error {
-	section := this.curSection.AddSection(name)
-	this.previous = append(this.previous, this.curSection)
-	this.curSection = section
+func (parser *Parser) parseSection(name string) error {
+	section := parser.curSection.AddSection(name)
+	parser.previous = append(parser.previous, parser.curSection)
+	parser.curSection = section
 	return nil
 }
 
-func (this *Parser) endSection() error {
-	if len(this.previous) == 0 {
-		return this.syntaxError("unexpected section end '}'")
+func (parser *Parser) endSection() error {
+	if len(parser.previous) == 0 {
+		return parser.syntaxError("unexpected section end '}'")
 	}
 
-	pLen := len(this.previous)
-	previous := this.previous[pLen-1]
-	this.previous = this.previous[0 : pLen-1]
-	this.curSection = previous
+	pLen := len(parser.previous)
+	previous := parser.previous[pLen-1]
+	parser.previous = parser.previous[0 : pLen-1]
+	parser.curSection = previous
 	return nil
 }
 
-func (this *Parser) GetSettings() *Section {
-	return this.settings
+func (parser *Parser) GetSettings() *Section {
+	return parser.settings
 }
 
-func (this *Parser) parse() error {
-	this.readToken()
+func (parser *Parser) parse() error {
+	parser.readToken()
 	for {
-		if this.curTok.ID == token.EOF {
+		if parser.curTok.ID == token.EOF {
 			break
 		}
-		tok := this.curTok
-		this.readToken()
+		tok := parser.curTok
+		parser.readToken()
 		switch tok.ID {
 		case token.COMMENT:
-			// this.curSection.AddComment(tok.Literal)
+			// parser.curSection.AddComment(tok.Literal)
 		case token.INCLUDE:
-			this.parseInclude()
+			parser.parseInclude()
 		case token.IDENTIFIER:
-			if this.curTok.ID == token.LBRACKET {
-				err := this.parseSection(tok.Literal)
+			if parser.curTok.ID == token.LBRACKET {
+				err := parser.parseSection(tok.Literal)
 				if err != nil {
 					return err
 				}
-				this.readToken()
-			} else if this.curTok.ID == token.EQUAL {
-				err := this.parseSetting(tok.Literal)
+				parser.readToken()
+			} else if parser.curTok.ID == token.EQUAL {
+				err := parser.parseSetting(tok.Literal)
 				if err != nil {
 					return err
 				}
 			}
 		case token.RBRACKET:
-			err := this.endSection()
+			err := parser.endSection()
 			if err != nil {
 				return err
 			}
 		default:
-			return this.syntaxError(fmt.Sprintf("unexpected token %s", tok))
+			return parser.syntaxError(fmt.Sprintf("unexpected token %s", tok))
 		}
 	}
 	return nil
 }
 
-func (this *Parser) Parse() error {
-	err := this.parse()
+func (parser *Parser) Parse() error {
+	err := parser.parse()
 	if err != nil {
 		return err
 	}
 
-	if len(this.previous) > 0 {
-		return this.syntaxError("expected end of section, instead found EOF")
+	if len(parser.previous) > 0 {
+		return parser.syntaxError("expected end of section, instead found EOF")
 	}
 
 	return nil
