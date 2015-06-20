@@ -1,20 +1,31 @@
 package forge
 
+// ValueType is an int type for representing the types of values forge can handle
 type ValueType int
 
 const (
+	// UNKNOWN ValueType
 	UNKNOWN ValueType = iota
 
-	// Primative values
+	primativesStart
+	// BOOLEAN ValueType
 	BOOLEAN
+	// FLOAT ValueType
 	FLOAT
+	// INTEGER ValueType
 	INTEGER
+	// NULL ValueType
 	NULL
+	// STRING ValueType
 	STRING
+	primativesDnd
 
-	// Complex values
+	complexStart
+	// REFERENCE ValueType
 	REFERENCE
+	// SECTION ValueType
 	SECTION
+	complexEnd
 )
 
 var valueTypes = [...]string{
@@ -41,6 +52,7 @@ func (valueType ValueType) String() string {
 	return str
 }
 
+// Value is the base interface for Primative and Section data types
 type Value interface {
 	GetType() ValueType
 	GetValue() interface{}
