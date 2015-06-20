@@ -216,11 +216,11 @@ func (section *Section) Resolve(name string) (Value, error) {
 			return value, errors.New("Trying to resolve value from non-section")
 		}
 
-		next_current, err := current.(*Section).Get(part)
+		nextCurrent, err := current.(*Section).Get(part)
 		if err != nil {
 			return value, errors.New("Could not find value in section")
 		}
-		current = next_current
+		current = nextCurrent
 	}
 	return current, nil
 }
