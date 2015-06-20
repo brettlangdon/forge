@@ -36,20 +36,20 @@ func isInclude(str string) bool {
 }
 
 type Scanner struct {
-	cur_line int
-	cur_col  int
-	cur_tok  token.Token
-	cur_ch   rune
-	newline  bool
-	reader   *bufio.Reader
+	curLine int
+	curCol  int
+	curTok  token.Token
+	curCh   rune
+	newline bool
+	reader  *bufio.Reader
 }
 
 func NewScanner(reader io.Reader) *Scanner {
 	scanner := &Scanner{
-		reader:   bufio.NewReader(reader),
-		cur_line: 0,
-		cur_col:  0,
-		newline:  false,
+		reader:  bufio.NewReader(reader),
+		curLine: 0,
+		curCol:  0,
+		newline: false,
 	}
 	scanner.readRune()
 	return scanner
@@ -57,84 +57,84 @@ func NewScanner(reader io.Reader) *Scanner {
 
 func (this *Scanner) readRune() {
 	if this.newline {
-		this.cur_line += 1
-		this.cur_col = 0
+		this.curLine += 1
+		this.curCol = 0
 		this.newline = false
 	} else {
-		this.cur_col += 1
+		this.curCol += 1
 	}
 
-	next_ch, _, err := this.reader.ReadRune()
+	nextCh, _, err := this.reader.ReadRune()
 	if err != nil {
-		this.cur_ch = eof
+		this.curCh = eof
 		return
 	}
 
-	this.cur_ch = next_ch
+	this.curCh = nextCh
 
-	if this.cur_ch == '\n' {
+	if this.curCh == '\n' {
 		this.newline = true
 	}
 }
 
 func (this *Scanner) parseIdentifier() {
-	this.cur_tok.ID = token.IDENTIFIER
-	this.cur_tok.Literal = string(this.cur_ch)
+	this.curTok.ID = token.IDENTIFIER
+	this.curTok.Literal = string(this.curCh)
 	for {
 		this.readRune()
-		if !isLetter(this.cur_ch) && this.cur_ch != '_' {
+		if !isLetter(this.curCh) && this.curCh != '_' {
 			break
 		}
-		this.cur_tok.Literal += string(this.cur_ch)
+		this.curTok.Literal += string(this.curCh)
 	}
 
-	if isBoolean(this.cur_tok.Literal) {
-		this.cur_tok.ID = token.BOOLEAN
-	} else if isNull(this.cur_tok.Literal) {
-		this.cur_tok.ID = token.NULL
-	} else if isInclude(this.cur_tok.Literal) {
-		this.cur_tok.ID = token.INCLUDE
+	if isBoolean(this.curTok.Literal) {
+		this.curTok.ID = token.BOOLEAN
+	} else if isNull(this.curTok.Literal) {
+		this.curTok.ID = token.NULL
+	} else if isInclude(this.curTok.Literal) {
+		this.curTok.ID = token.INCLUDE
 	}
 }
 
 func (this *Scanner) parseNumber() {
-	this.cur_tok.ID = token.INTEGER
-	this.cur_tok.Literal = string(this.cur_ch)
+	this.curTok.ID = token.INTEGER
+	this.curTok.Literal = string(this.curCh)
 	digit := false
 	for {
 		this.readRune()
-		if this.cur_ch == '.' && digit == false {
-			this.cur_tok.ID = token.FLOAT
+		if this.curCh == '.' && digit == false {
+			this.curTok.ID = token.FLOAT
 			digit = true
-		} else if !isDigit(this.cur_ch) {
+		} else if !isDigit(this.curCh) {
 			break
 		}
-		this.cur_tok.Literal += string(this.cur_ch)
+		this.curTok.Literal += string(this.curCh)
 	}
 }
 
 func (this *Scanner) parseString() {
-	this.cur_tok.ID = token.STRING
-	this.cur_tok.Literal = string(this.cur_ch)
+	this.curTok.ID = token.STRING
+	this.curTok.Literal = string(this.curCh)
 	for {
 		this.readRune()
-		if this.cur_ch == '"' {
+		if this.curCh == '"' {
 			break
 		}
-		this.cur_tok.Literal += string(this.cur_ch)
+		this.curTok.Literal += string(this.curCh)
 	}
 	this.readRune()
 }
 
 func (this *Scanner) parseComment() {
-	this.cur_tok.ID = token.COMMENT
-	this.cur_tok.Literal = ""
+	this.curTok.ID = token.COMMENT
+	this.curTok.Literal = ""
 	for {
 		this.readRune()
-		if this.cur_ch == '\n' {
+		if this.curCh == '\n' {
 			break
 		}
-		this.cur_tok.Literal += string(this.cur_ch)
+		this.curTok.Literal += string(this.curCh)
 	}
 	this.readRune()
 }
@@ -142,25 +142,25 @@ func (this *Scanner) parseComment() {
 func (this *Scanner) skipWhitespace() {
 	for {
 		this.readRune()
-		if !isWhitespace(this.cur_ch) {
+		if !isWhitespace(this.curCh) {
 			break
 		}
 	}
 }
 
 func (this *Scanner) NextToken() token.Token {
-	if isWhitespace(this.cur_ch) {
+	if isWhitespace(this.curCh) {
 		this.skipWhitespace()
 	}
 
-	this.cur_tok = token.Token{
+	this.curTok = token.Token{
 		ID:      token.ILLEGAL,
-		Literal: string(this.cur_ch),
-		Line:    this.cur_line,
-		Column:  this.cur_col,
+		Literal: string(this.curCh),
+		Line:    this.curLine,
+		Column:  this.curCol,
 	}
 
-	switch ch := this.cur_ch; {
+	switch ch := this.curCh; {
 	case isLetter(ch) || ch == '_':
 		this.parseIdentifier()
 	case isDigit(ch):
@@ -168,26 +168,26 @@ func (this *Scanner) NextToken() token.Token {
 	case ch == '#':
 		this.parseComment()
 	case ch == eof:
-		this.cur_tok.ID = token.EOF
-		this.cur_tok.Literal = "EOF"
+		this.curTok.ID = token.EOF
+		this.curTok.Literal = "EOF"
 	default:
 		this.readRune()
-		this.cur_tok.Literal = string(ch)
+		this.curTok.Literal = string(ch)
 		switch ch {
 		case '=':
-			this.cur_tok.ID = token.EQUAL
+			this.curTok.ID = token.EQUAL
 		case '"':
 			this.parseString()
 		case '{':
-			this.cur_tok.ID = token.LBRACKET
+			this.curTok.ID = token.LBRACKET
 		case '}':
-			this.cur_tok.ID = token.RBRACKET
+			this.curTok.ID = token.RBRACKET
 		case ';':
-			this.cur_tok.ID = token.SEMICOLON
+			this.curTok.ID = token.SEMICOLON
 		case '.':
-			this.cur_tok.ID = token.PERIOD
+			this.curTok.ID = token.PERIOD
 		}
 	}
 
-	return this.cur_tok
+	return this.curTok
 }
