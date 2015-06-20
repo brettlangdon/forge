@@ -105,10 +105,16 @@ import (
 	"strings"
 )
 
+// ParseBytes takes a []byte representation of the config file, parses it
+// and responds with `*Section` and potentially an `error` if it cannot
+// properly parse the config
 func ParseBytes(data []byte) (*Section, error) {
 	return ParseReader(bytes.NewReader(data))
 }
 
+// ParseFile takes a string filename for the config file, parses it
+// and responds with `*Section` and potentially an `error` if it cannot
+// properly parse the configf
 func ParseFile(filename string) (*Section, error) {
 	reader, err := os.Open(filename)
 	if err != nil {
@@ -117,6 +123,9 @@ func ParseFile(filename string) (*Section, error) {
 	return ParseReader(reader)
 }
 
+// ParseReader takes an `io.Reader` representation of the config file, parses it
+// and responds with `*Section` and potentially an `error` if it cannot
+// properly parse the config
 func ParseReader(reader io.Reader) (*Section, error) {
 	parser := NewParser(reader)
 	err := parser.Parse()
@@ -127,6 +136,9 @@ func ParseReader(reader io.Reader) (*Section, error) {
 	return parser.GetSettings(), nil
 }
 
+// ParseString takes a string representation of the config file, parses it
+// and responds with `*Section` and potentially an `error` if it cannot
+// properly parse the config
 func ParseString(data string) (*Section, error) {
 	return ParseReader(strings.NewReader(data))
 }
