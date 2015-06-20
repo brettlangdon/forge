@@ -25,18 +25,18 @@ func NewChildSection(parent *Section) *Section {
 	}
 }
 
-func (this *Section) GetType() ValueType {
+func (section *Section) GetType() ValueType {
 	return SECTION
 }
 
-func (this *Section) GetValue() interface{} {
-	return this.values
+func (section *Section) GetValue() interface{} {
+	return section.values
 }
 
-func (this *Section) UpdateValue(value interface{}) error {
+func (section *Section) UpdateValue(value interface{}) error {
 	switch value.(type) {
 	case map[string]Value:
-		this.values = value.(map[string]Value)
+		section.values = value.(map[string]Value)
 		return nil
 	}
 
@@ -44,19 +44,19 @@ func (this *Section) UpdateValue(value interface{}) error {
 	return errors.New(msg)
 }
 
-func (this *Section) AddSection(name string) *Section {
-	section := NewChildSection(this)
-	this.values[name] = section
-	return section
+func (section *Section) AddSection(name string) *Section {
+	childSection := NewChildSection(section)
+	section.values[name] = childSection
+	return childSection
 }
 
-func (this *Section) Exists(name string) bool {
-	_, err := this.Get(name)
+func (section *Section) Exists(name string) bool {
+	_, err := section.Get(name)
 	return err == nil
 }
 
-func (this *Section) Get(name string) (Value, error) {
-	value, ok := this.values[name]
+func (section *Section) Get(name string) (Value, error) {
+	value, ok := section.values[name]
 	var err error
 	if ok == false {
 		err = errors.New("Value does not exist")
@@ -64,8 +64,8 @@ func (this *Section) Get(name string) (Value, error) {
 	return value, err
 }
 
-func (this *Section) GetBoolean(name string) (bool, error) {
-	value, err := this.Get(name)
+func (section *Section) GetBoolean(name string) (bool, error) {
+	value, err := section.Get(name)
 	if err != nil {
 		return false, err
 	}
@@ -80,8 +80,8 @@ func (this *Section) GetBoolean(name string) (bool, error) {
 	return false, errors.New("Could not convert unknown value to boolean")
 }
 
-func (this *Section) GetFloat(name string) (float64, error) {
-	value, err := this.Get(name)
+func (section *Section) GetFloat(name string) (float64, error) {
+	value, err := section.Get(name)
 	if err != nil {
 		return float64(0), err
 	}
@@ -94,8 +94,8 @@ func (this *Section) GetFloat(name string) (float64, error) {
 	return float64(0), errors.New("Could not convert non-primative value to float")
 }
 
-func (this *Section) GetInteger(name string) (int64, error) {
-	value, err := this.Get(name)
+func (section *Section) GetInteger(name string) (int64, error) {
+	value, err := section.Get(name)
 	if err != nil {
 		return int64(0), err
 	}
@@ -108,8 +108,8 @@ func (this *Section) GetInteger(name string) (int64, error) {
 	return int64(0), errors.New("Could not convert non-primative value to integer")
 }
 
-func (this *Section) GetSection(name string) (*Section, error) {
-	value, err := this.Get(name)
+func (section *Section) GetSection(name string) (*Section, error) {
+	value, err := section.Get(name)
 	if err != nil {
 		return nil, err
 	}
@@ -120,8 +120,8 @@ func (this *Section) GetSection(name string) (*Section, error) {
 	return nil, errors.New("Could not fetch value as section")
 }
 
-func (this *Section) GetString(name string) (string, error) {
-	value, err := this.Get(name)
+func (section *Section) GetString(name string) (string, error) {
+	value, err := section.Get(name)
 	if err != nil {
 		return "", err
 	}
@@ -134,73 +134,73 @@ func (this *Section) GetString(name string) (string, error) {
 	return "", errors.New("Could not convert non-primative value to string")
 }
 
-func (this *Section) GetParent() *Section {
-	return this.parent
+func (section *Section) GetParent() *Section {
+	return section.parent
 }
 
-func (this *Section) HasParent() bool {
-	return this.parent != nil
+func (section *Section) HasParent() bool {
+	return section.parent != nil
 }
 
-func (this *Section) Set(name string, value Value) {
-	this.values[name] = value
+func (section *Section) Set(name string, value Value) {
+	section.values[name] = value
 }
 
-func (this *Section) SetBoolean(name string, value bool) {
-	current, err := this.Get(name)
+func (section *Section) SetBoolean(name string, value bool) {
+	current, err := section.Get(name)
 
 	// Exists just update the value/type
 	if err == nil {
 		current.UpdateValue(value)
 	} else {
-		this.values[name] = NewBoolean(value)
+		section.values[name] = NewBoolean(value)
 	}
 }
 
-func (this *Section) SetFloat(name string, value float64) {
-	current, err := this.Get(name)
+func (section *Section) SetFloat(name string, value float64) {
+	current, err := section.Get(name)
 
 	// Exists just update the value/type
 	if err == nil {
 		current.UpdateValue(value)
 	} else {
-		this.values[name] = NewFloat(value)
+		section.values[name] = NewFloat(value)
 	}
 }
 
-func (this *Section) SetInteger(name string, value int64) {
-	current, err := this.Get(name)
+func (section *Section) SetInteger(name string, value int64) {
+	current, err := section.Get(name)
 
 	// Exists just update the value/type
 	if err == nil {
 		current.UpdateValue(value)
 	} else {
-		this.values[name] = NewInteger(value)
+		section.values[name] = NewInteger(value)
 	}
 }
 
-func (this *Section) SetNull(name string) {
-	current, err := this.Get(name)
+func (section *Section) SetNull(name string) {
+	current, err := section.Get(name)
 
 	// Already is a Null, nothing to do
 	if err == nil && current.GetType() == NULL {
 		return
 	}
-	this.Set(name, NewNull())
+	section.Set(name, NewNull())
 }
 
-func (this *Section) SetString(name string, value string) {
-	current, err := this.Get(name)
+func (section *Section) SetString(name string, value string) {
+	current, err := section.Get(name)
 
 	// Exists just update the value/type
 	if err == nil {
 		current.UpdateValue(value)
 	} else {
-		this.Set(name, NewString(value))
+		section.Set(name, NewString(value))
 	}
 }
 
-func (this *Section) Resolve(name string) (Value, error) {
+func (section *Section) Resolve(name string) (Value, error) {
 	// Used only in error state return value
 	var value Value
 
@@ -210,7 +210,7 @@ func (this *Section) Resolve(name string) (Value, error) {
 	}
 
 	var current Value
-	current = this
+	current = section
 	for _, part := range parts {
 		if current.GetType() != SECTION {
 			return value, errors.New("Trying to resolve value from non-section")
@@ -225,15 +225,15 @@ func (this *Section) Resolve(name string) (Value, error) {
 	return current, nil
 }
 
-func (this *Section) ToJSON() ([]byte, error) {
-	data := this.ToMap()
+func (section *Section) ToJSON() ([]byte, error) {
+	data := section.ToMap()
 	return json.Marshal(data)
 }
 
-func (this *Section) ToMap() map[string]interface{} {
+func (section *Section) ToMap() map[string]interface{} {
 	output := make(map[string]interface{})
 
-	for key, value := range this.values {
+	for key, value := range section.values {
 		if value.GetType() == SECTION {
 			output[key] = value.(*Section).ToMap()
 		} else {
