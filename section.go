@@ -18,7 +18,7 @@ func NewSection() *Section {
 	}
 }
 
-func NewChildSection(parent *Section) *Section {
+func newChildSection(parent *Section) *Section {
 	return &Section{
 		parent: parent,
 		values: make(map[string]Value),
@@ -45,7 +45,7 @@ func (section *Section) UpdateValue(value interface{}) error {
 }
 
 func (section *Section) AddSection(name string) *Section {
-	childSection := NewChildSection(section)
+	childSection := newChildSection(section)
 	section.values[name] = childSection
 	return childSection
 }
