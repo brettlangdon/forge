@@ -61,23 +61,6 @@
 //      An identifier which main contain periods which starts with a period, the references
 //      are resolved from the settings current section (e.g. .value, .sub_section.value)
 //
-// Note about references.
-// References are resolved during parsing not access (they do not act as pointers... today).
-// Meaning that if I have the following config:
-//   setting = "value";
-//   ref_to_setting = setting;
-//
-// During parsing when I get to `ref_to_setting` it will be resolved immediately and it's value will
-// be set to `"value"`.
-//
-// This config example, however, will raise a parsing error since it cannot resolve the reference:
-//   ref_to_setting = setting;
-//   setting = "value";
-//
-// Since `setting` does not exist yet.
-// This is mostly due to the naive implementation of references today. How they work may change in
-// future versions or they may disappear entirely.
-//
 // Directives
 //  * Comment:
 //      A comment is a pound symbol ('#') followed by any text any which ends with a newline (e.g. '# I am a comment\n')
@@ -94,6 +77,25 @@
 //      An include statement tells the config parser to include the contents of another config file where the include
 //      statement is defined. Includes are in the format 'include "<pattern>";'. The <pattern> can be any glob
 //      like pattern which is compatible with `path.filepath.Match` http://golang.org/pkg/path/filepath/#Match
+//
+// Note about references.
+//
+// References are resolved during parsing not access (they do not act as pointers... today).
+// Meaning that if I have the following config:
+//   setting = "value";
+//   ref_to_setting = setting;
+//
+// During parsing when I get to `ref_to_setting` it will be resolved immediately and it's value will
+// be set to `"value"`.
+//
+// This config example, however, will raise a parsing error since it cannot resolve the reference:
+//   ref_to_setting = setting;
+//   setting = "value";
+//
+// Since `setting` does not exist yet.
+// This is mostly due to the naive implementation of references today. How they work may change in
+// future versions or they may disappear entirely.
+//
 package forge
 
 import (
