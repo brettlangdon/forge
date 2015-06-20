@@ -11,6 +11,7 @@ import (
 	"github.com/brettlangdon/forge/token"
 )
 
+// Parser is a struct to hold data necessary for parsing a config from a scanner
 type Parser struct {
 	settings   *Section
 	scanner    *Scanner
@@ -19,6 +20,7 @@ type Parser struct {
 	previous   []*Section
 }
 
+// NewParser will create and initialize a new Parser from a provided io.Reader
 func NewParser(reader io.Reader) *Parser {
 	settings := NewSection()
 	return &Parser{
@@ -195,10 +197,6 @@ func (parser *Parser) endSection() error {
 	return nil
 }
 
-func (parser *Parser) GetSettings() *Section {
-	return parser.settings
-}
-
 func (parser *Parser) parse() error {
 	parser.readToken()
 	for {
@@ -237,6 +235,12 @@ func (parser *Parser) parse() error {
 	return nil
 }
 
+// GetSettings will fetch the parsed settings from this Parser
+func (parser *Parser) GetSettings() *Section {
+	return parser.settings
+}
+
+// Parse will tell the Parser to parse all settings from the config
 func (parser *Parser) Parse() error {
 	err := parser.parse()
 	if err != nil {
