@@ -57,11 +57,11 @@ func NewScanner(reader io.Reader) *Scanner {
 
 func (scanner *Scanner) readRune() {
 	if scanner.newline {
-		scanner.curLine += 1
+		scanner.curLine++
 		scanner.curCol = 0
 		scanner.newline = false
 	} else {
-		scanner.curCol += 1
+		scanner.curCol++
 	}
 
 	nextCh, _, err := scanner.reader.ReadRune()
