@@ -87,7 +87,7 @@ func (parser *Parser) parseSetting(name string) error {
 	var value Value
 	parser.readToken()
 
-	read_next := true
+	readNext := true
 	switch parser.curTok.ID {
 	case token.STRING:
 		value = NewString(parser.curTok.Literal)
@@ -117,21 +117,21 @@ func (parser *Parser) parseSetting(name string) error {
 			return err
 		}
 		value = reference
-		read_next = false
+		readNext = false
 	case token.IDENTIFIER:
 		reference, err := parser.parseReference(parser.settings, false)
 		if err != nil {
 			return err
 		}
 		value = reference
-		read_next = false
+		readNext = false
 	default:
 		return parser.syntaxError(
 			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", parser.curTok.ID),
 		)
 	}
 
-	if read_next {
+	if readNext {
 		parser.readToken()
 	}
 	if parser.curTok.ID != token.SEMICOLON {
