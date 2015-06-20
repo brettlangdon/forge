@@ -37,53 +37,53 @@ func NewString(value string) *Primative {
 	return NewPrimative(STRING, value)
 }
 
-func (this *Primative) GetType() ValueType {
-	return this.valueType
+func (primative *Primative) GetType() ValueType {
+	return primative.valueType
 }
 
-func (this *Primative) GetValue() interface{} {
-	return this.value
+func (primative *Primative) GetValue() interface{} {
+	return primative.value
 }
 
-func (this *Primative) UpdateValue(value interface{}) error {
+func (primative *Primative) UpdateValue(value interface{}) error {
 	// Valid types
 	switch value.(type) {
 	case bool:
-		this.valueType = BOOLEAN
+		primative.valueType = BOOLEAN
 	case float64:
-		this.valueType = FLOAT
+		primative.valueType = FLOAT
 	case int64:
-		this.valueType = INTEGER
+		primative.valueType = INTEGER
 	case nil:
-		this.valueType = NULL
+		primative.valueType = NULL
 	case string:
-		this.valueType = STRING
+		primative.valueType = STRING
 	default:
 		msg := fmt.Sprintf("Unsupported type, %s must be of (bool, float64, int64, nil, string)", value)
 		return errors.New(msg)
 
 	}
-	this.value = value
+	primative.value = value
 	return nil
 }
 
-func (this *Primative) AsBoolean() (bool, error) {
-	return asBoolean(this.value)
+func (primative *Primative) AsBoolean() (bool, error) {
+	return asBoolean(primative.value)
 }
 
-func (this *Primative) AsFloat() (float64, error) {
-	return asFloat(this.value)
+func (primative *Primative) AsFloat() (float64, error) {
+	return asFloat(primative.value)
 }
 
-func (this *Primative) AsInteger() (int64, error) {
-	return asInteger(this.value)
+func (primative *Primative) AsInteger() (int64, error) {
+	return asInteger(primative.value)
 }
 
-func (this *Primative) AsString() (string, error) {
-	return asString(this.value)
+func (primative *Primative) AsString() (string, error) {
+	return asString(primative.value)
 }
 
-func (this *Primative) String() string {
-	str, _ := this.AsString()
+func (primative *Primative) String() string {
+	str, _ := primative.AsString()
 	return str
 }
