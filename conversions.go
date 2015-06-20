@@ -28,11 +28,12 @@ func asBoolean(value interface{}) (bool, error) {
 func asFloat(value interface{}) (float64, error) {
 	switch val := value.(type) {
 	case bool:
+		v := float64(0)
 		if val {
-			return float64(1), nil
-		} else {
-			return float64(0), nil
+			v = float64(1)
 		}
+
+		return v, nil
 	case float64:
 		return val, nil
 	case int64:
@@ -48,11 +49,11 @@ func asFloat(value interface{}) (float64, error) {
 func asInteger(value interface{}) (int64, error) {
 	switch val := value.(type) {
 	case bool:
+		v := int64(0)
 		if val {
-			return int64(1), nil
-		} else {
-			return int64(0), nil
+			v = int64(1)
 		}
+		return v, nil
 	case float64:
 		return int64(math.Trunc(val)), nil
 	case int64:
@@ -68,11 +69,11 @@ func asInteger(value interface{}) (int64, error) {
 func asString(value interface{}) (string, error) {
 	switch val := value.(type) {
 	case bool:
+		s := "False"
 		if val {
-			return "True", nil
-		} else {
-			return "False", nil
+			s = "True"
 		}
+		return s, nil
 	case float64:
 		return strconv.FormatFloat(val, 10, -1, 64), nil
 	case int64:
