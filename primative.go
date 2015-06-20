@@ -3,6 +3,8 @@ package forge
 import (
 	"errors"
 	"fmt"
+	"math"
+	"strconv"
 )
 
 type Primative struct {
@@ -68,19 +70,94 @@ func (primative *Primative) UpdateValue(value interface{}) error {
 }
 
 func (primative *Primative) AsBoolean() (bool, error) {
-	return asBoolean(primative.value)
+	switch val := primative.value.(type) {
+	case bool:
+		return val, nil
+	case float64:
+		return val != 0, nil
+	case int64:
+		return val != 0, nil
+	case nil:
+		return false, nil
+	case string:
+		return val != "", nil
+	}
+
+	msg := fmt.Sprintf("Could not convert value %s to type BOOLEAN", primative.value)
+	return false, errors.New(msg)
 }
 
 func (primative *Primative) AsFloat() (float64, error) {
-	return asFloat(primative.value)
+	switch val := primative.value.(type) {
+	case bool:
+		floatVal := float64(0)
+		if val {
+			floatVal = float64(1)
+		}
+
+		return floatVal, nil
+	case float64:
+		return val, nil
+	case int64:
+		return float64(val), nil
+	case string:
+		return strconv.ParseFloat(val, 64)
+	}
+
+	msg := fmt.Sprintf("Could not convert value %s to type FLOAT", primative.value)
+	return 0, errors.New(msg)
 }
 
 func (primative *Primative) AsInteger() (int64, error) {
-	return asInteger(primative.value)
+	switch val := primative.value.(type) {
+	case bool:
+		intVal := int64(0)
+		if val {
+			intVal = int64(1)
+		}
+		return intVal, nil
+	case float64:
+		return int64(math.Trunc(val)), nil
+	case int64:
+		return val, nil
+	case string:
+		return strconv.ParseInt(val, 10, 64)
+	}
+
+	msg := fmt.Sprintf("Could not convert value %s to type INTEGER", primative.value)
+	return 0, errors.New(msg)
+}
+
+func (primative *Primative) AsNull() (interface{}, error) {
+	switch val := primative.value.(type) {
+	case nil:
+		return val, nil
+	}
+
+	msg := fmt.Sprintf("Could not convert value %s to nil", primative.value)
+	return 0, errors.New(msg)
 }
 
 func (primative *Primative) AsString() (string, error) {
-	return asString(primative.value)
+	switch val := primative.value.(type) {
+	case bool:
+		strVal := "False"
+		if val {
+			strVal = "True"
+		}
+		return strVal, nil
+	case float64:
+		return strconv.FormatFloat(val, 10, -1, 64), nil
+	case int64:
+		return strconv.FormatInt(val, 10), nil
+	case nil:
+		return "Null", nil
+	case string:
+		return val, nil
+	}
+
+	msg := fmt.Sprintf("Could not convert value %s to type STRING", primative.value)
+	return "", errors.New(msg)
 }
 
 func (primative *Primative) String() string {
