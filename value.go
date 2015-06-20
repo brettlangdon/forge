@@ -28,10 +28,10 @@ var valueTypes = [...]string{
 	SECTION:   "SECTION",
 }
 
-func (this ValueType) String() string {
+func (valueType ValueType) String() string {
 	str := ""
-	if 0 <= this && this < ValueType(len(valueTypes)) {
-		str = valueTypes[this]
+	if 0 <= valueType && valueType < ValueType(len(valueTypes)) {
+		str = valueTypes[valueType]
 	}
 
 	if str == "" {
