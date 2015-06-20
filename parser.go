@@ -1,4 +1,4 @@
-package parser
+package forge
 
 import (
 	"errors"
@@ -8,19 +8,28 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/brettlangdon/forge/config"
 	"github.com/brettlangdon/forge/token"
 )
 
 type Parser struct {
-	settings    *config.SectionValue
-	tokenizer   *token.Tokenizer
+	settings    *Section
+	scanner     *Scanner
 	cur_tok     token.Token
-	cur_section *config.SectionValue
-	previous    []*config.SectionValue
+	cur_section *Section
+	previous    []*Section
 }
 
-func (this *Parser) SyntaxError(msg string) error {
+func NewParser(reader io.Reader) *Parser {
+	settings := NewSection()
+	return &Parser{
+		scanner:     NewScanner(reader),
+		settings:    settings,
+		cur_section: settings,
+		previous:    make([]*Section, 0),
+	}
+}
+
+func (this *Parser) syntaxError(msg string) error {
 	msg = fmt.Sprintf(
 		"Syntax error line <%d> column <%d>: %s",
 		this.cur_tok.Line,
@@ -31,11 +40,11 @@ func (this *Parser) SyntaxError(msg string) error {
 }
 
 func (this *Parser) readToken() token.Token {
-	this.cur_tok = this.tokenizer.NextToken()
+	this.cur_tok = this.scanner.NextToken()
 	return this.cur_tok
 }
 
-func (this *Parser) parseReference(starting_section *config.SectionValue, period bool) (config.ConfigValue, error) {
+func (this *Parser) parseReference(starting_section *Section, period bool) (Value, error) {
 	name := ""
 	if period == false {
 		name = this.cur_tok.Literal
@@ -54,69 +63,54 @@ func (this *Parser) parseReference(starting_section *config.SectionValue, period
 			break
 		} else {
 			msg := fmt.Sprintf("expected ';' instead found '%s'", this.cur_tok.Literal)
-			return nil, this.SyntaxError(msg)
+			return nil, this.syntaxError(msg)
 		}
 	}
 	if len(name) == 0 {
-		return nil, this.SyntaxError(
+		return nil, this.syntaxError(
 			fmt.Sprintf("expected IDENTIFIER instead found %s", this.cur_tok.Literal),
 		)
 	}
 
 	if period {
-		return nil, this.SyntaxError(fmt.Sprintf("expected IDENTIFIER after PERIOD"))
+		return nil, this.syntaxError(fmt.Sprintf("expected IDENTIFIER after PERIOD"))
 	}
 
 	value, err := starting_section.Resolve(name)
 	if err != nil {
 		err = errors.New("Reference error, " + err.Error())
 	}
-	return value, err
+	return value, nil
 }
 
 func (this *Parser) parseSetting(name string) error {
-	var value config.ConfigValue
+	var value Value
 	this.readToken()
 
 	read_next := true
 	switch this.cur_tok.ID {
 	case token.STRING:
-		value = config.StringValue{
-			Name:  name,
-			Value: this.cur_tok.Literal,
-		}
+		value = NewString(this.cur_tok.Literal)
 	case token.BOOLEAN:
 		bool_val, err := strconv.ParseBool(this.cur_tok.Literal)
 		if err != nil {
 			return nil
 		}
-		value = config.BooleanValue{
-			Name:  name,
-			Value: bool_val,
-		}
+		value = NewBoolean(bool_val)
 	case token.NULL:
-		value = config.NullValue{
-			Name:  name,
-			Value: nil,
-		}
+		value = NewNull()
 	case token.INTEGER:
 		int_val, err := strconv.ParseInt(this.cur_tok.Literal, 10, 64)
 		if err != nil {
 			return err
 		}
-		value = config.IntegerValue{
-			Name:  name,
-			Value: int_val,
-		}
+		value = NewInteger(int_val)
 	case token.FLOAT:
 		float_val, err := strconv.ParseFloat(this.cur_tok.Literal, 64)
 		if err != nil {
 			return err
 		}
-		value = config.FloatValue{
-			Name:  name,
-			Value: float_val,
-		}
+		value = NewFloat(float_val)
 	case token.PERIOD:
 		reference, err := this.parseReference(this.cur_section, true)
 		if err != nil {
@@ -132,7 +126,7 @@ func (this *Parser) parseSetting(name string) error {
 		value = reference
 		read_next = false
 	default:
-		return this.SyntaxError(
+		return this.syntaxError(
 			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", this.cur_tok.ID),
 		)
 	}
@@ -142,7 +136,7 @@ func (this *Parser) parseSetting(name string) error {
 	}
 	if this.cur_tok.ID != token.SEMICOLON {
 		msg := fmt.Sprintf("expected ';' instead found '%s'", this.cur_tok.Literal)
-		return this.SyntaxError(msg)
+		return this.syntaxError(msg)
 	}
 	this.readToken()
 
@@ -153,38 +147,37 @@ func (this *Parser) parseSetting(name string) error {
 func (this *Parser) parseInclude() error {
 	if this.cur_tok.ID != token.STRING {
 		msg := fmt.Sprintf("expected STRING instead found '%s'", this.cur_tok.ID)
-		return this.SyntaxError(msg)
+		return this.syntaxError(msg)
 	}
 	pattern := this.cur_tok.Literal
 
 	this.readToken()
 	if this.cur_tok.ID != token.SEMICOLON {
 		msg := fmt.Sprintf("expected ';' instead found '%s'", this.cur_tok.Literal)
-		return this.SyntaxError(msg)
+		return this.syntaxError(msg)
 	}
 
 	filenames, err := filepath.Glob(pattern)
 	if err != nil {
 		return err
 	}
-	old_tokenizer := this.tokenizer
+	old_scanner := this.scanner
 	for _, filename := range filenames {
 		reader, err := os.Open(filename)
 		if err != nil {
 			return err
 		}
-		this.cur_section.AddInclude(filename)
-		this.tokenizer = token.NewTokenizer(reader)
-		this.Parse()
+		// this.cur_section.AddInclude(filename)
+		this.scanner = NewScanner(reader)
+		this.parse()
 	}
-	this.tokenizer = old_tokenizer
+	this.scanner = old_scanner
 	this.readToken()
 	return nil
 }
 
 func (this *Parser) parseSection(name string) error {
-	section := config.NewNamedSection(name)
-	this.cur_section.Set(name, section)
+	section := this.cur_section.AddSection(name)
 	this.previous = append(this.previous, this.cur_section)
 	this.cur_section = section
 	return nil
@@ -192,7 +185,7 @@ func (this *Parser) parseSection(name string) error {
 
 func (this *Parser) endSection() error {
 	if len(this.previous) == 0 {
-		return this.SyntaxError("unexpected section end '}'")
+		return this.syntaxError("unexpected section end '}'")
 	}
 
 	p_len := len(this.previous)
@@ -202,7 +195,11 @@ func (this *Parser) endSection() error {
 	return nil
 }
 
-func (this *Parser) Parse() error {
+func (this *Parser) GetSettings() *Section {
+	return this.settings
+}
+
+func (this *Parser) parse() error {
 	this.readToken()
 	for {
 		if this.cur_tok.ID == token.EOF {
@@ -212,7 +209,7 @@ func (this *Parser) Parse() error {
 		this.readToken()
 		switch tok.ID {
 		case token.COMMENT:
-			this.cur_section.AddComment(tok.Literal)
+			// this.cur_section.AddComment(tok.Literal)
 		case token.INCLUDE:
 			this.parseInclude()
 		case token.IDENTIFIER:
@@ -234,36 +231,21 @@ func (this *Parser) Parse() error {
 				return err
 			}
 		default:
-			return this.SyntaxError(fmt.Sprintf("unexpected token %s", tok))
+			return this.syntaxError(fmt.Sprintf("unexpected token %s", tok))
 		}
 	}
 	return nil
 }
 
-func ParseFile(filename string) (settings *config.SectionValue, err error) {
-	reader, err := os.Open(filename)
+func (this *Parser) Parse() error {
+	err := this.parse()
 	if err != nil {
-		return settings, err
-	}
-	return ParseReader(reader)
-}
-
-func ParseReader(reader io.Reader) (*config.SectionValue, error) {
-	settings := config.NewAnonymousSection()
-	parser := &Parser{
-		tokenizer:   token.NewTokenizer(reader),
-		settings:    settings,
-		cur_section: settings,
-		previous:    make([]*config.SectionValue, 0),
-	}
-	err := parser.Parse()
-	if err != nil {
-		return nil, err
+		return err
 	}
 
-	if len(parser.previous) > 0 {
-		return nil, parser.SyntaxError("expected end of section, instead found EOF")
+	if len(this.previous) > 0 {
+		return this.syntaxError("expected end of section, instead found EOF")
 	}
 
-	return settings, nil
+	return nil
 }

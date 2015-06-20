@@ -13,19 +13,18 @@ func main() {
 		panic(err)
 	}
 
-	// Get a single value
-	if settings.Contains("global") {
-		// Get `global` casted as `StringValue`
-		value := settings.GetString("global")
-		fmt.Printf("global = \"%s\"\r\n", value.GetValue())
+	str_val, err := settings.GetString("global")
+	if err != nil {
+		panic(err)
 	}
+	fmt.Printf("global = \"%s\"\r\n", str_val)
 
 	// Get a nested value
-	value, err := settings.Resolve("primary.included_setting")
-	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
+	// value, err := settings.Resolve("primary.included_setting")
+	// fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
 
 	// Convert settings to a map
-	settingsMap, err := settings.ToMap()
+	settingsMap := settings.ToMap()
 	fmt.Printf("global = \"%s\"\r\n", settingsMap["global"])
 
 	// Convert settings to JSON

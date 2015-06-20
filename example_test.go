@@ -15,7 +15,7 @@ func Example() {
 	}
 
 	// Get a single value
-	if settings.Contains("global") {
+	if settings.Exists("global") {
 		// Get `global` casted as `StringValue`
 		value := settings.GetString("global")
 		fmt.Printf("global = \"%s\"\r\n", value.GetValue())
@@ -28,7 +28,7 @@ func Example() {
 	// You can also traverse down the sections manually
 	primary, err := settings.GetSection("primary")
 	value, err := primary.GetString("included_setting")
-	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
+	fmt.Printf("primary.included_setting = \"%s\"\r\n", value)
 
 	// Convert settings to a map
 	settingsMap, err := settings.ToMap()

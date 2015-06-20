@@ -83,28 +83,32 @@ package forge
 import (
 	"bytes"
 	"io"
+	"os"
 	"strings"
-
-	"github.com/brettlangdon/forge/config"
-	"github.com/brettlangdon/forge/parser"
 )
 
-// ParseString will parse a forge SectionValue from a string
-func ParseString(data string) (*config.SectionValue, error) {
-	return parser.ParseReader(strings.NewReader(data))
+func ParseBytes(data []byte) (*Section, error) {
+	return ParseReader(bytes.NewReader(data))
 }
 
-// ParseBytes will parse a forge SectionValue from a byte array
-func ParseBytes(data []byte) (*config.SectionValue, error) {
-	return parser.ParseReader(bytes.NewReader(data))
+func ParseFile(filename string) (*Section, error) {
+	reader, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return ParseReader(reader)
 }
 
-// ParseFile will parse a forge SectionValue from a filename
-func ParseFile(filename string) (*config.SectionValue, error) {
-	return parser.ParseFile(filename)
+func ParseReader(reader io.Reader) (*Section, error) {
+	parser := NewParser(reader)
+	err := parser.Parse()
+	if err != nil {
+		return nil, err
+	}
+
+	return parser.GetSettings(), nil
 }
 
-// ParseReader will parse a forge SectionValue from a io.Reader
-func ParseReader(reader io.Reader) (*config.SectionValue, error) {
-	return parser.ParseReader(reader)
+func ParseString(data string) (*Section, error) {
+	return ParseReader(strings.NewReader(data))
 }
