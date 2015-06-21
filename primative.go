@@ -7,46 +7,63 @@ import (
 	"strconv"
 )
 
+// Primative struct for holding data about primative values
 type Primative struct {
 	valueType ValueType
 	value     interface{}
 }
 
-func NewPrimative(valueType ValueType, value interface{}) *Primative {
+func newPrimative(valueType ValueType, value interface{}) *Primative {
 	return &Primative{
 		valueType: valueType,
 		value:     value,
 	}
 }
 
+// NewPrimative will create a new empty Primative and call UpdateValue
+// with the provided value
+func NewPrimative(value interface{}) (*Primative, error) {
+	primative := &Primative{}
+	err := primative.UpdateValue(value)
+	return primative, err
+}
+
+// NewBoolean will create and initialize a new Boolean type primative value
 func NewBoolean(value bool) *Primative {
-	return NewPrimative(BOOLEAN, value)
+	return newPrimative(BOOLEAN, value)
 }
 
+// NewFloat will create and initialize a new Float type primative value
 func NewFloat(value float64) *Primative {
-	return NewPrimative(FLOAT, value)
+	return newPrimative(FLOAT, value)
 }
 
+// NewInteger will create and initialize a new Integer type primative value
 func NewInteger(value int64) *Primative {
-	return NewPrimative(INTEGER, value)
+	return newPrimative(INTEGER, value)
 }
 
+// NewNull will create and initialize a new Null type primative value
 func NewNull() *Primative {
-	return NewPrimative(NULL, nil)
+	return newPrimative(NULL, nil)
 }
 
+// NewString will create and initialize a new String type primative value
 func NewString(value string) *Primative {
-	return NewPrimative(STRING, value)
+	return newPrimative(STRING, value)
 }
 
+// GetType will return the ValueType associated with this primative
 func (primative *Primative) GetType() ValueType {
 	return primative.valueType
 }
 
+// GetValue returns the raw interface{} value assigned to this primative
 func (primative *Primative) GetValue() interface{} {
 	return primative.value
 }
 
+// UpdateValue will update the internal value and stored ValueType for this primative
 func (primative *Primative) UpdateValue(value interface{}) error {
 	// Valid types
 	switch value.(type) {
@@ -69,6 +86,7 @@ func (primative *Primative) UpdateValue(value interface{}) error {
 	return nil
 }
 
+// AsBoolean tries to convert/return the value stored in this primative as a bool
 func (primative *Primative) AsBoolean() (bool, error) {
 	switch val := primative.value.(type) {
 	case bool:
@@ -87,6 +105,7 @@ func (primative *Primative) AsBoolean() (bool, error) {
 	return false, errors.New(msg)
 }
 
+// AsFloat tries to convert/return the value stored in this primative as a float64
 func (primative *Primative) AsFloat() (float64, error) {
 	switch val := primative.value.(type) {
 	case bool:
@@ -108,6 +127,7 @@ func (primative *Primative) AsFloat() (float64, error) {
 	return 0, errors.New(msg)
 }
 
+// AsInteger tries to convert/return the value stored in this primative as a int64
 func (primative *Primative) AsInteger() (int64, error) {
 	switch val := primative.value.(type) {
 	case bool:
@@ -128,6 +148,7 @@ func (primative *Primative) AsInteger() (int64, error) {
 	return 0, errors.New(msg)
 }
 
+// AsNull tries to convert/return the value stored in this primative as a null
 func (primative *Primative) AsNull() (interface{}, error) {
 	switch val := primative.value.(type) {
 	case nil:
@@ -138,6 +159,7 @@ func (primative *Primative) AsNull() (interface{}, error) {
 	return 0, errors.New(msg)
 }
 
+// AsString tries to convert/return the value stored in this primative as a string
 func (primative *Primative) AsString() (string, error) {
 	switch val := primative.value.(type) {
 	case bool:
