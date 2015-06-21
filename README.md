@@ -17,7 +17,7 @@ Documentation can be viewed on godoc: https://godoc.org/github.com/brettlangdon/
 
 You can see example usage in the `example` folder.
 
-``cfg
+```cfg
 # example.cfg
 
 # Global directives
