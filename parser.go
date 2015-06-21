@@ -36,6 +36,7 @@ func NewParser(reader io.Reader) *Parser {
 // NewFileParser will create and initialize a new Parser from a provided from a filename string
 func NewFileParser(filename string) (*Parser, error) {
 	reader, err := os.Open(filename)
+	defer reader.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -197,6 +198,7 @@ func (parser *Parser) parseInclude() error {
 			continue
 		}
 		reader, err := os.Open(filename)
+		defer reader.Close()
 		if err != nil {
 			return err
 		}
