@@ -35,7 +35,7 @@ secondary {
 `)
 
 var exampleConfigString = string(exampleConfigBytes)
-var exampleConfigReader = bytes.NewBuffer(exampleConfigBytes)
+var exampleConfigReader = bytes.NewReader(exampleConfigBytes)
 
 func BenchmarkParseBytes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -57,7 +57,7 @@ func BenchmarkParseString(b *testing.B) {
 
 func BenchmarkParseReader(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		exampleConfigReader.Reset()
+		exampleConfigReader.Seek(0, 0)
 		_, err := forge.ParseReader(exampleConfigReader)
 		if err != nil {
 			panic(err)
