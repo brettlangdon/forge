@@ -247,6 +247,7 @@ func TestUpdateValue(t *testing.T) {
 }
 
 func TestUpdateValueUnknown(t *testing.T) {
+	t.Parallel()
 	value, err := forge.NewPrimative("hello")
 	if err != nil {
 		t.Error(err)
@@ -257,6 +258,150 @@ func TestUpdateValueUnknown(t *testing.T) {
 	err = value.UpdateValue(newVal)
 	if err == nil {
 		t.Error("expected an error, got none")
+		return
+	}
+}
+
+func TestAsBoolean(t *testing.T) {
+	t.Parallel()
+
+	// Boolean true
+	value := forge.NewBoolean(true)
+	val, err := value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != true {
+		t.Error("expected value to be 'true'")
+		return
+	}
+
+	// Boolean false
+	err = value.UpdateValue(false)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != false {
+		t.Error("expected value to be 'false'")
+		return
+	}
+
+	// Int true
+	err = value.UpdateValue(1)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != true {
+		t.Error("expected value to be 'true'")
+		return
+	}
+
+	// Int false
+	err = value.UpdateValue(0)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != false {
+		t.Error("expected value to be 'false'")
+		return
+	}
+
+	// Float true
+	err = value.UpdateValue(float64(1))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != true {
+		t.Error("expected value to be 'true'")
+		return
+	}
+
+	// Float false
+	err = value.UpdateValue(float64(0))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != false {
+		t.Error("expected value to be 'false'")
+		return
+	}
+
+	// Null true
+	err = value.UpdateValue(nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != false {
+		t.Error("expected value to be 'false'")
+		return
+	}
+
+	// String true
+	err = value.UpdateValue("anything")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != true {
+		t.Error("expected value to be 'true'")
+		return
+	}
+
+	// String false
+	err = value.UpdateValue("")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	val, err = value.AsBoolean()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if val != false {
+		t.Error("expected value to be 'false'")
 		return
 	}
 }
