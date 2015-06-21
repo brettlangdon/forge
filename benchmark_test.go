@@ -67,7 +67,7 @@ func BenchmarkParseReader(b *testing.B) {
 
 func BenchmarkParseFile(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, err := forge.ParseFile("./benchmark.cfg")
+		_, err := forge.ParseFile("./test.cfg")
 		if err != nil {
 			b.Fatal(err)
 		}
