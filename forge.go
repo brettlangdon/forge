@@ -26,11 +26,12 @@
 // Config file format:
 //
 //     IDENTIFIER: [_a-zA-Z]+
+//     NUMBERS: [0-9]+
 //
 //     BOOL: 'true' | 'false'
 //     NULL: 'null'
-//     INTEGER: [0-9]+
-//     FLOAT: INTEGER '.' INTEGER
+//     INTEGER: NUMBERS | ('-' NUMBERS)
+//     FLOAT: (NUMBERS '.' NUMBERS) | ('-' NUMBERS . NUMBERS)
 //     STRING: '"' .* '"'
 //     REFERENCE: [IDENTIFIER] ('.' IDENTIFIER)+
 //     VALUE: BOOL | NULL | INTEGER | FLOAT | STRING | REFERENCE

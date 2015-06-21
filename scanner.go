@@ -100,9 +100,13 @@ func (scanner *Scanner) parseIdentifier() {
 	}
 }
 
-func (scanner *Scanner) parseNumber() {
+func (scanner *Scanner) parseNumber(negative bool) {
 	scanner.curTok.ID = token.INTEGER
 	scanner.curTok.Literal = string(scanner.curCh)
+	if negative {
+		scanner.curTok.Literal = "-" + scanner.curTok.Literal
+	}
+
 	digit := false
 	for {
 		scanner.readRune()
@@ -168,7 +172,7 @@ func (scanner *Scanner) NextToken() token.Token {
 	case isLetter(ch) || ch == '_':
 		scanner.parseIdentifier()
 	case isDigit(ch):
-		scanner.parseNumber()
+		scanner.parseNumber(false)
 	case ch == '#':
 		scanner.parseComment()
 	case ch == eof:
@@ -190,6 +194,10 @@ func (scanner *Scanner) NextToken() token.Token {
 			scanner.curTok.ID = token.SEMICOLON
 		case '.':
 			scanner.curTok.ID = token.PERIOD
+		case '-':
+			if isDigit(scanner.curCh) {
+				scanner.parseNumber(true)
+			}
 		}
 	}
 
