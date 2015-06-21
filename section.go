@@ -7,11 +7,13 @@ import (
 	"strings"
 )
 
+// Section struct holds a map of values
 type Section struct {
 	parent *Section
 	values map[string]Value
 }
 
+// NewSection will create and initialize a new Section
 func NewSection() *Section {
 	return &Section{
 		values: make(map[string]Value),
@@ -25,14 +27,17 @@ func newChildSection(parent *Section) *Section {
 	}
 }
 
+// GetType will respond with the ValueType of this Section (hint, always SECTION)
 func (section *Section) GetType() ValueType {
 	return SECTION
 }
 
+// GetValue retrieves the raw underlying value stored in this Section
 func (section *Section) GetValue() interface{} {
 	return section.values
 }
 
+// UpdateValue updates the raw underlying value stored in this Section
 func (section *Section) UpdateValue(value interface{}) error {
 	switch value.(type) {
 	case map[string]Value:
@@ -44,17 +49,21 @@ func (section *Section) UpdateValue(value interface{}) error {
 	return errors.New(msg)
 }
 
+// AddSection adds a new child section to this Section with the provided name
 func (section *Section) AddSection(name string) *Section {
 	childSection := newChildSection(section)
 	section.values[name] = childSection
 	return childSection
 }
 
+// Exists returns true when a value stored under the key exists
 func (section *Section) Exists(name string) bool {
 	_, err := section.Get(name)
 	return err == nil
 }
 
+// Get the value (Primative or Section) stored under the name
+// will respond with an error if the value does not exist
 func (section *Section) Get(name string) (Value, error) {
 	value, ok := section.values[name]
 	var err error
@@ -64,6 +73,8 @@ func (section *Section) Get(name string) (Value, error) {
 	return value, err
 }
 
+// GetBoolean will try to get the value stored under name as a bool
+// will respond with an error if the value does not exist or cannot be converted to a bool
 func (section *Section) GetBoolean(name string) (bool, error) {
 	value, err := section.Get(name)
 	if err != nil {
@@ -80,6 +91,8 @@ func (section *Section) GetBoolean(name string) (bool, error) {
 	return false, errors.New("Could not convert unknown value to boolean")
 }
 
+// GetFloat will try to get the value stored under name as a float64
+// will respond with an error if the value does not exist or cannot be converted to a float64
 func (section *Section) GetFloat(name string) (float64, error) {
 	value, err := section.Get(name)
 	if err != nil {
@@ -94,6 +107,8 @@ func (section *Section) GetFloat(name string) (float64, error) {
 	return float64(0), errors.New("Could not convert non-primative value to float")
 }
 
+// GetInteger will try to get the value stored under name as a int64
+// will respond with an error if the value does not exist or cannot be converted to a int64
 func (section *Section) GetInteger(name string) (int64, error) {
 	value, err := section.Get(name)
 	if err != nil {
@@ -108,6 +123,8 @@ func (section *Section) GetInteger(name string) (int64, error) {
 	return int64(0), errors.New("Could not convert non-primative value to integer")
 }
 
+// GetSection will try to get the value stored under name as a Section
+// will respond with an error if the value does not exist or is not a Section
 func (section *Section) GetSection(name string) (*Section, error) {
 	value, err := section.Get(name)
 	if err != nil {
@@ -120,6 +137,8 @@ func (section *Section) GetSection(name string) (*Section, error) {
 	return nil, errors.New("Could not fetch value as section")
 }
 
+// GetString will try to get the value stored under name as a string
+// will respond with an error if the value does not exist or cannot be converted to a string
 func (section *Section) GetString(name string) (string, error) {
 	value, err := section.Get(name)
 	if err != nil {
@@ -134,18 +153,23 @@ func (section *Section) GetString(name string) (string, error) {
 	return "", errors.New("Could not convert non-primative value to string")
 }
 
+// GetParent will get the parent section associated with this Section or nil
+// if it does not have one
 func (section *Section) GetParent() *Section {
 	return section.parent
 }
 
+// HasParent will return true if this Section has a parent
 func (section *Section) HasParent() bool {
 	return section.parent != nil
 }
 
+// Set will set a value (Primative or Section) to the provided name
 func (section *Section) Set(name string, value Value) {
 	section.values[name] = value
 }
 
+// SetBoolean will set the value for name as a bool
 func (section *Section) SetBoolean(name string, value bool) {
 	current, err := section.Get(name)
 
@@ -157,6 +181,7 @@ func (section *Section) SetBoolean(name string, value bool) {
 	}
 }
 
+// SetFloat will set the value for name as a float64
 func (section *Section) SetFloat(name string, value float64) {
 	current, err := section.Get(name)
 
@@ -168,6 +193,7 @@ func (section *Section) SetFloat(name string, value float64) {
 	}
 }
 
+// SetInteger will set the value for name as a int64
 func (section *Section) SetInteger(name string, value int64) {
 	current, err := section.Get(name)
 
@@ -179,6 +205,7 @@ func (section *Section) SetInteger(name string, value int64) {
 	}
 }
 
+// SetNull will set the value for name as nil
 func (section *Section) SetNull(name string) {
 	current, err := section.Get(name)
 
@@ -189,6 +216,7 @@ func (section *Section) SetNull(name string) {
 	section.Set(name, NewNull())
 }
 
+// SetString will set the value for name as a string
 func (section *Section) SetString(name string, value string) {
 	current, err := section.Get(name)
 
@@ -200,6 +228,9 @@ func (section *Section) SetString(name string, value string) {
 	}
 }
 
+// Resolve will recursively try to fetch the provided value and will respond
+// with an error if the name does not exist or tries to be resolved through
+// a non-section value
 func (section *Section) Resolve(name string) (Value, error) {
 	// Used only in error state return value
 	var value Value
@@ -225,11 +256,15 @@ func (section *Section) Resolve(name string) (Value, error) {
 	return current, nil
 }
 
+// ToJSON will convert this Section and all it's underlying values and Sections
+// into JSON as a []byte
 func (section *Section) ToJSON() ([]byte, error) {
 	data := section.ToMap()
 	return json.Marshal(data)
 }
 
+// ToMap will convert this Section and all it's underlying values and Sections into
+// a map[string]interface{}
 func (section *Section) ToMap() map[string]interface{} {
 	output := make(map[string]interface{})
 
