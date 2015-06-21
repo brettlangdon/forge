@@ -66,23 +66,23 @@ func main() {
 	}
 
 	// Get a single value
-	if settings.Contains("global") {
-		// Get `global` casted as `StringValue`
-		value := settings.GetString("global")
-		fmt.Printf("global = \"%s\"\r\n", value.GetValue())
+	if settings.Exists("global") {
+		// Get `global` casted as a string
+		value, _ := settings.GetString("global")
+		fmt.Printf("global = \"%s\"\r\n", value)
 	}
 
 	// Get a nested value
 	value, err := settings.Resolve("primary.included_setting")
 	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
 
-	// You can also traverse down the sections
+	// You can also traverse down the sections manually
 	primary, err := settings.GetSection("primary")
-	value, err := primary.GetString("included_setting")
-	fmt.Printf("primary.included_setting = \"%s\"\r\n", value.GetValue())
+	strVal, err := primary.GetString("included_setting")
+	fmt.Printf("primary.included_setting = \"%s\"\r\n", strVal)
 
 	// Convert settings to a map
-	settingsMap, err := settings.ToMap()
+	settingsMap := settings.ToMap()
 	fmt.Printf("global = \"%s\"\r\n", settingsMap["global"])
 
 	// Convert settings to JSON
