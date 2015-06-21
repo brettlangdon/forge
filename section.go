@@ -9,22 +9,48 @@ import (
 
 // Section struct holds a map of values
 type Section struct {
-	parent *Section
-	values map[string]Value
+	comments []string
+	includes []string
+	parent   *Section
+	values   map[string]Value
 }
 
 // NewSection will create and initialize a new Section
 func NewSection() *Section {
 	return &Section{
-		values: make(map[string]Value),
+		comments: make([]string, 0),
+		includes: make([]string, 0),
+		values:   make(map[string]Value),
 	}
 }
 
 func newChildSection(parent *Section) *Section {
 	return &Section{
-		parent: parent,
-		values: make(map[string]Value),
+		comments: make([]string, 0),
+		includes: make([]string, 0),
+		parent:   parent,
+		values:   make(map[string]Value),
 	}
+}
+
+// AddComment will append a new comment into the section
+func (section *Section) AddComment(comment string) {
+	section.comments = append(section.comments, comment)
+}
+
+// AddInclude will append a new filename into the section
+func (section *Section) AddInclude(filename string) {
+	section.includes = append(section.includes, filename)
+}
+
+// GetComments will return all the comments were defined for this Section
+func (section *Section) GetComments() []string {
+	return section.comments
+}
+
+// GetIncludes will return the filenames of all the includes were parsed for this Section
+func (section *Section) GetIncludes() []string {
+	return section.includes
 }
 
 // GetType will respond with the ValueType of this Section (hint, always SECTION)

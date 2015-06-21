@@ -169,7 +169,7 @@ func (parser *Parser) parseInclude() error {
 		if err != nil {
 			return err
 		}
-		// parser.curSection.AddInclude(filename)
+		parser.curSection.AddInclude(filename)
 		parser.scanner = NewScanner(reader)
 		parser.parse()
 	}
@@ -207,7 +207,7 @@ func (parser *Parser) parse() error {
 		parser.readToken()
 		switch tok.ID {
 		case token.COMMENT:
-			// parser.curSection.AddComment(tok.Literal)
+			parser.curSection.AddComment(tok.Literal)
 		case token.INCLUDE:
 			parser.parseInclude()
 		case token.IDENTIFIER:
