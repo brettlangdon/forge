@@ -71,6 +71,9 @@ func (primative *Primative) UpdateValue(value interface{}) error {
 		primative.valueType = BOOLEAN
 	case float64:
 		primative.valueType = FLOAT
+	case int:
+		value = int64(value.(int))
+		primative.valueType = INTEGER
 	case int64:
 		primative.valueType = INTEGER
 	case nil:
