@@ -13,6 +13,7 @@ import (
 
 // Parser is a struct to hold data necessary for parsing a config from a scanner
 type Parser struct {
+	files      []string
 	settings   *Section
 	scanner    *Scanner
 	curTok     token.Token
@@ -24,11 +25,36 @@ type Parser struct {
 func NewParser(reader io.Reader) *Parser {
 	settings := NewSection()
 	return &Parser{
+		files:      make([]string, 0),
 		scanner:    NewScanner(reader),
 		settings:   settings,
 		curSection: settings,
 		previous:   make([]*Section, 0),
 	}
+}
+
+// NewParser will create and initialize a new Parser from a provided from a filename string
+func NewFileParser(filename string) (*Parser, error) {
+	reader, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	parser := NewParser(reader)
+	parser.addFile(filename)
+	return parser, nil
+}
+
+func (parser *Parser) addFile(filename string) {
+	parser.files = append(parser.files, filename)
+}
+
+func (parser *Parser) hasParsed(search string) bool {
+	for _, filename := range parser.files {
+		if filename == search {
+			return true
+		}
+	}
+	return false
 }
 
 func (parser *Parser) syntaxError(msg string) error {
@@ -165,6 +191,11 @@ func (parser *Parser) parseInclude() error {
 	}
 	oldScanner := parser.scanner
 	for _, filename := range filenames {
+		// We have already visited this file, don't include again
+		// DEV: This can cause recursive includes if this isn't here :o
+		if parser.hasParsed(filename) {
+			continue
+		}
 		reader, err := os.Open(filename)
 		if err != nil {
 			return err
@@ -172,6 +203,9 @@ func (parser *Parser) parseInclude() error {
 		parser.curSection.AddInclude(filename)
 		parser.scanner = NewScanner(reader)
 		parser.parse()
+		// Make sure to add the filename to the internal list to ensure we don't
+		// accidentally recursively include config files
+		parser.addFile(filename)
 	}
 	parser.scanner = oldScanner
 	parser.readToken()

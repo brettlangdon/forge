@@ -101,7 +101,6 @@ package forge
 import (
 	"bytes"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -116,11 +115,16 @@ func ParseBytes(data []byte) (*Section, error) {
 // and responds with `*Section` and potentially an `error` if it cannot
 // properly parse the configf
 func ParseFile(filename string) (*Section, error) {
-	reader, err := os.Open(filename)
+	parser, err := NewFileParser(filename)
 	if err != nil {
 		return nil, err
 	}
-	return ParseReader(reader)
+	err = parser.Parse()
+	if err != nil {
+		return nil, err
+	}
+
+	return parser.GetSettings(), nil
 }
 
 // ParseReader takes an `io.Reader` representation of the config file, parses it
