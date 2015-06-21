@@ -41,7 +41,7 @@ func BenchmarkParseBytes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, err := forge.ParseBytes(exampleConfigBytes)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 	}
 }
@@ -50,7 +50,7 @@ func BenchmarkParseString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, err := forge.ParseString(exampleConfigString)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 	}
 }
@@ -60,7 +60,7 @@ func BenchmarkParseReader(b *testing.B) {
 		exampleConfigReader.Seek(0, 0)
 		_, err := forge.ParseReader(exampleConfigReader)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 	}
 }
@@ -69,7 +69,7 @@ func BenchmarkParseFile(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, err := forge.ParseFile("./benchmark.cfg")
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 	}
 }
