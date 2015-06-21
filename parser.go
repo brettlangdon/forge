@@ -33,7 +33,7 @@ func NewParser(reader io.Reader) *Parser {
 
 func (parser *Parser) syntaxError(msg string) error {
 	msg = fmt.Sprintf(
-		"Syntax error line <%d> column <%d>: %s",
+		"syntax error line <%d> column <%d>: %s",
 		parser.curTok.Line,
 		parser.curTok.Column,
 		msg,
@@ -80,7 +80,7 @@ func (parser *Parser) parseReference(startingSection *Section, period bool) (Val
 
 	value, err := startingSection.Resolve(name)
 	if err != nil {
-		err = errors.New("Reference error, " + err.Error())
+		err = errors.New("reference error, " + err.Error())
 	}
 	return value, nil
 }

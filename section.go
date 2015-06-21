@@ -45,7 +45,7 @@ func (section *Section) UpdateValue(value interface{}) error {
 		return nil
 	}
 
-	msg := fmt.Sprintf("Unsupported type, %s must be of type `map[string]Value`", value)
+	msg := fmt.Sprintf("unsupported type, %s must be of type `map[string]Value`", value)
 	return errors.New(msg)
 }
 
@@ -68,7 +68,7 @@ func (section *Section) Get(name string) (Value, error) {
 	value, ok := section.values[name]
 	var err error
 	if ok == false {
-		err = errors.New("Value does not exist")
+		err = errors.New("value does not exist")
 	}
 	return value, err
 }
@@ -88,7 +88,7 @@ func (section *Section) GetBoolean(name string) (bool, error) {
 		return true, nil
 	}
 
-	return false, errors.New("Could not convert unknown value to boolean")
+	return false, errors.New("could not convert unknown value to boolean")
 }
 
 // GetFloat will try to get the value stored under name as a float64
@@ -104,7 +104,7 @@ func (section *Section) GetFloat(name string) (float64, error) {
 		return value.(*Primative).AsFloat()
 	}
 
-	return float64(0), errors.New("Could not convert non-primative value to float")
+	return float64(0), errors.New("could not convert non-primative value to float")
 }
 
 // GetInteger will try to get the value stored under name as a int64
@@ -120,7 +120,7 @@ func (section *Section) GetInteger(name string) (int64, error) {
 		return value.(*Primative).AsInteger()
 	}
 
-	return int64(0), errors.New("Could not convert non-primative value to integer")
+	return int64(0), errors.New("could not convert non-primative value to integer")
 }
 
 // GetSection will try to get the value stored under name as a Section
@@ -134,7 +134,7 @@ func (section *Section) GetSection(name string) (*Section, error) {
 	if value.GetType() == SECTION {
 		return value.(*Section), nil
 	}
-	return nil, errors.New("Could not fetch value as section")
+	return nil, errors.New("could not fetch value as section")
 }
 
 // GetString will try to get the value stored under name as a string
@@ -150,7 +150,7 @@ func (section *Section) GetString(name string) (string, error) {
 		return value.(*Primative).AsString()
 	}
 
-	return "", errors.New("Could not convert non-primative value to string")
+	return "", errors.New("could not convert non-primative value to string")
 }
 
 // GetParent will get the parent section associated with this Section or nil
@@ -237,19 +237,19 @@ func (section *Section) Resolve(name string) (Value, error) {
 
 	parts := strings.Split(name, ".")
 	if len(parts) == 0 {
-		return value, errors.New("No name provided")
+		return value, errors.New("no name provided")
 	}
 
 	var current Value
 	current = section
 	for _, part := range parts {
 		if current.GetType() != SECTION {
-			return value, errors.New("Trying to resolve value from non-section")
+			return value, errors.New("trying to resolve value from non-section")
 		}
 
 		nextCurrent, err := current.(*Section).Get(part)
 		if err != nil {
-			return value, errors.New("Could not find value in section")
+			return value, errors.New("could not find value in section")
 		}
 		current = nextCurrent
 	}
