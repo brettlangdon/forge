@@ -12,4 +12,8 @@ bench:
 coverage:
 	out=`mktemp -t "forge-coverage"`; go test -coverprofile=$$out && go tool cover -html=$$out
 
-.PHONY: lint test
+deps:
+	go get golang.org/x/tools/cmd/cover
+	go get github.com/golang/lint/golint
+
+.PHONY: test lint go-test bench coverage deps
