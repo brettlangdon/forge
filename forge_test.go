@@ -20,6 +20,8 @@ primary {
   boolean = true;
   not_true = FALSE;
   nothing = NULL;
+  # Reference secondary._under (which hasn't been defined yet)
+  sec_ref = secondary._under;
    # Primary-sub stuff
   sub {
       key = "primary sub key value";
@@ -58,6 +60,7 @@ func assertDirectives(values map[string]interface{}, t *testing.T) {
 	assertEqual(primary["boolean"], true, t)
 	assertEqual(primary["not_true"], false, t)
 	assertEqual(primary["nothing"], nil, t)
+	assertEqual(primary["sec_ref"], int64(50), t)
 
 	// Primary Sub
 	sub := primary["sub"].(map[string]interface{})
