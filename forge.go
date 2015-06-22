@@ -30,10 +30,10 @@
 //
 //     BOOL: 'true' | 'false'
 //     NULL: 'null'
-//     INTEGER: NUMBERS | ('-' NUMBERS)
-//     FLOAT: (NUMBERS '.' NUMBERS) | ('-' NUMBERS . NUMBERS)
+//     INTEGER: ('-')? NUMBERS
+//     FLOAT: ('-')? NUMBERS '.' NUMBERS
 //     STRING: '"' .* '"'
-//     REFERENCE: [IDENTIFIER] ('.' IDENTIFIER)+
+//     REFERENCE: (IDENTIFIER)? ('.' IDENTIFIER)+
 //     VALUE: BOOL | NULL | INTEGER | FLOAT | STRING | REFERENCE
 //
 //     INCLUDE: 'include ' STRING ';'
