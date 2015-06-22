@@ -105,11 +105,7 @@ func (parser *Parser) parseReference(startingSection *Section, period bool) (Val
 		return nil, parser.syntaxError(fmt.Sprintf("expected IDENTIFIER after PERIOD"))
 	}
 
-	value, err := startingSection.Resolve(name)
-	if err != nil {
-		err = errors.New("reference error, " + err.Error())
-	}
-	return value, nil
+	return NewReference(name, startingSection), nil
 }
 
 func (parser *Parser) parseSetting(name string) error {
