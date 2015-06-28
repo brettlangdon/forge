@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -197,6 +198,7 @@ func (section *Section) Keys() []string {
 		keys = append(keys, key)
 	}
 
+	sort.Strings(keys)
 	return keys
 }
 
