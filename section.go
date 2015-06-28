@@ -192,8 +192,8 @@ func (section *Section) HasParent() bool {
 
 // Keys will return back a list of all setting names in this Section
 func (section *Section) Keys() []string {
-	keys := make([]string, 0)
-	for key, _ := range section.values {
+	var keys []string
+	for key := range section.values {
 		keys = append(keys, key)
 	}
 
