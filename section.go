@@ -190,6 +190,16 @@ func (section *Section) HasParent() bool {
 	return section.parent != nil
 }
 
+// Keys will return back a list of all setting names in this Section
+func (section *Section) Keys() []string {
+	keys := make([]string, 0)
+	for key, _ := range section.values {
+		keys = append(keys, key)
+	}
+
+	return keys
+}
+
 // Set will set a value (Primative or Section) to the provided name
 func (section *Section) Set(name string, value Value) {
 	section.values[name] = value
