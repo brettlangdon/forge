@@ -14,6 +14,7 @@ global = "global value";
 # Primary stuff
 primary {
   string = "primary string value";
+  string_with_quote = "some \"quoted\" str\\ing";
   integer = 500;
   float = 80.80;
   negative = -50;
@@ -54,6 +55,7 @@ func assertDirectives(values map[string]interface{}, t *testing.T) {
 	// Primary
 	primary := values["primary"].(map[string]interface{})
 	assertEqual(primary["string"], "primary string value", t)
+	assertEqual(primary["string_with_quote"], "some \"quoted\" str\\ing", t)
 	assertEqual(primary["integer"], int64(500), t)
 	assertEqual(primary["float"], float64(80.80), t)
 	assertEqual(primary["negative"], int64(-50), t)
