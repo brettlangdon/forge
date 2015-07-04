@@ -14,6 +14,10 @@ func isLetter(ch rune) bool {
 	return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z')
 }
 
+func isEscapeCharacter(ch rune) bool {
+	return ch == '\\' || ch == '"'
+}
+
 func isDigit(ch rune) bool {
 	return ('0' <= ch && ch <= '9')
 }
@@ -123,10 +127,26 @@ func (scanner *Scanner) parseNumber(negative bool) {
 func (scanner *Scanner) parseString() {
 	scanner.curTok.ID = token.STRING
 	scanner.curTok.Literal = string(scanner.curCh)
+	// Whether or not we are trying to escape a character
+	escape := false
 	for {
 		scanner.readRune()
-		if scanner.curCh == '"' {
-			break
+		if escape == false {
+			// We haven't seen a backslash yet
+			if scanner.curCh == '\\' {
+				// A new backslash
+				escape = true
+				continue
+			} else if scanner.curCh == '"' {
+				// An unescaped quote, time to bail out
+				break
+			}
+		} else if isEscapeCharacter(scanner.curCh) {
+			// A valid escape character, continue as normal
+			escape = false
+		} else {
+			// We had a backslash, but an invalid escape character
+			// TODO: "Unsupported escape character found"
 		}
 		scanner.curTok.Literal += string(scanner.curCh)
 	}
