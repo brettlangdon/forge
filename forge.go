@@ -46,7 +46,8 @@
 //
 // Values
 //  * String:
-//      Any value enclosed in double quotes (single quotes not allowed) (e.g. "string")
+//      Any value enclosed in double quotes (single quotes not allowed) (e.g. "string").
+//      Double quotes and backslashes can be escaped with backslashes (e.g. "\"quoted\"" and "\\<--backslash")
 //  * Integer:
 //      Any number without decimal places (e.g. 500)
 //  * Float:
