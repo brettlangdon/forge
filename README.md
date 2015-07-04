@@ -8,7 +8,7 @@ Forge is a configuration syntax and parser.
 
 ## Installation
 
-`git get github.com/brettlangdon/forge`
+`go get github.com/brettlangdon/forge`
 
 ## Documentation
 
