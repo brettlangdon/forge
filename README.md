@@ -23,6 +23,9 @@ You can see example usage in the `example` folder.
 
 # Global directives
 global = "global value";
+# Pull in the "PATH" environment variable
+path_env = $PATH;
+
 # Primary section
 primary {
   string = "primary string value";
