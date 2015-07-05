@@ -150,9 +150,12 @@ func (parser *Parser) parseSetting(name string) error {
 		}
 		value = reference
 		readNext = false
+	case token.ENVIRONMENT:
+		var envVal = os.Getenv(parser.curTok.Literal)
+		value = NewString(envVal)
 	default:
 		return parser.syntaxError(
-			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", parser.curTok.ID),
+			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN, IDENTIFIER or ENVIRONMENT, instead found %s", parser.curTok.ID),
 		)
 	}
 
