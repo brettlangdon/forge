@@ -1,0 +1,19 @@
+2015-07-14  Brett Langdon  <brett@blangdon.com>
+
+	* v0.1.4: Make semicolons optional
+
+2015-07-14  Brett Langdon  <brett@blangdon.com>
+
+	* v0.1.3: Allow single quoted strings
+
+2015-07-04  Brett Langdon  <brett@blangdon.com>
+
+	* v0.1.2: Allow escaped double quotes and backslashes in strings
+
+2015-06-28  Brett Langdon  <brett@blangdon.com>
+
+	* v0.1.1: Add `Section.Keys` method
+
+2015-06-22  Brett Langdon  <brett@blangdon.com>
+
+	* v0.1.0: Initial release
