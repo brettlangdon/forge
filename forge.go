@@ -34,7 +34,8 @@
 //     FLOAT: ('-')? NUMBERS '.' NUMBERS
 //     STRING: ['"] .* ['"]
 //     REFERENCE: (IDENTIFIER)? ('.' IDENTIFIER)+
-//     VALUE: BOOL | NULL | INTEGER | FLOAT | STRING | REFERENCE
+//     ENVIRONMENT: '$' IDENTIFIER
+//     VALUE: BOOL | NULL | INTEGER | FLOAT | STRING | REFERENCE | ENVIRONMENT
 //
 //     INCLUDE: 'include ' STRING ';'
 //     DIRECTIVE: (IDENTIFIER '=' VALUE | INCLUDE) ';'
@@ -62,6 +63,10 @@
 //  * Local reference:
 //      An identifier which main contain periods which starts with a period, the references
 //      are resolved from the settings current section (e.g. .value, .sub_section.value)
+//  * Environment:
+//      An environment is a way to pull in environment variables into your config. Environment variables
+//      are identifiers which start with a dollar sign (e.g. $PATH). Environment variables are always
+//      represented as strings and are evaluated at parse time.
 //
 // Directives
 //  * Comment:

@@ -171,6 +171,18 @@ func (scanner *Scanner) parseComment() {
 	scanner.readRune()
 }
 
+func (scanner *Scanner) parseEnvironment() {
+	scanner.curTok.ID = token.ENVIRONMENT
+	scanner.curTok.Literal = ""
+	for {
+		scanner.readRune()
+		if !isLetter(scanner.curCh) && scanner.curCh != '_' {
+			break
+		}
+		scanner.curTok.Literal += string(scanner.curCh)
+	}
+}
+
 func (scanner *Scanner) skipWhitespace() {
 	for {
 		scanner.readRune()
@@ -200,6 +212,8 @@ func (scanner *Scanner) NextToken() token.Token {
 		scanner.parseNumber(false)
 	case ch == '#':
 		scanner.parseComment()
+	case ch == '$':
+		scanner.parseEnvironment()
 	case ch == eof:
 		scanner.curTok.ID = token.EOF
 		scanner.curTok.Literal = "EOF"
