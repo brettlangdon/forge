@@ -26,6 +26,7 @@ global = "global value";
 # Primary section
 primary {
   string = "primary string value";
+  single = 'single quotes are allowed too';
   integer = 500;
   float = 80.80;
   boolean = true;
