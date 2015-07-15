@@ -18,8 +18,8 @@ func isDigit(ch rune) bool {
 	return ('0' <= ch && ch <= '9')
 }
 
-func isWhitespace(ch rune) bool {
-	return (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+func isNonNewlineWhitespace(ch rune) bool {
+	return (ch == ' ' || ch == '\t' || ch == '\r')
 }
 
 func isBoolean(str string) bool {
@@ -171,10 +171,10 @@ func (scanner *Scanner) parseComment() {
 	scanner.readRune()
 }
 
-func (scanner *Scanner) skipWhitespace() {
+func (scanner *Scanner) skipNonNewlineWhitespace() {
 	for {
 		scanner.readRune()
-		if !isWhitespace(scanner.curCh) {
+		if !isNonNewlineWhitespace(scanner.curCh) {
 			break
 		}
 	}
@@ -182,8 +182,8 @@ func (scanner *Scanner) skipWhitespace() {
 
 // NextToken will read in the next valid token from the Scanner
 func (scanner *Scanner) NextToken() token.Token {
-	if isWhitespace(scanner.curCh) {
-		scanner.skipWhitespace()
+	if isNonNewlineWhitespace(scanner.curCh) {
+		scanner.skipNonNewlineWhitespace()
 	}
 
 	scanner.curTok = token.Token{
@@ -217,6 +217,8 @@ func (scanner *Scanner) NextToken() token.Token {
 			scanner.curTok.ID = token.RBRACKET
 		case ';':
 			scanner.curTok.ID = token.SEMICOLON
+		case '\n':
+			scanner.curTok.ID = token.NEWLINE
 		case '.':
 			scanner.curTok.ID = token.PERIOD
 		case '-':

@@ -11,6 +11,10 @@ import (
 	"github.com/brettlangdon/forge/token"
 )
 
+func isSemicolonOrNewline(id token.TokenID) bool {
+	return id == token.SEMICOLON || id == token.NEWLINE
+}
+
 // Parser is a struct to hold data necessary for parsing a config from a scanner
 type Parser struct {
 	files      []string
@@ -88,10 +92,10 @@ func (parser *Parser) parseReference(startingSection *Section, period bool) (Val
 			}
 			name += parser.curTok.Literal
 			period = false
-		} else if parser.curTok.ID == token.SEMICOLON {
+		} else if isSemicolonOrNewline(parser.curTok.ID) {
 			break
 		} else {
-			msg := fmt.Sprintf("expected ';' instead found '%s'", parser.curTok.Literal)
+			msg := fmt.Sprintf("expected ';' or '\n' instead found '%s'", parser.curTok.Literal)
 			return nil, parser.syntaxError(msg)
 		}
 	}
@@ -159,8 +163,8 @@ func (parser *Parser) parseSetting(name string) error {
 	if readNext {
 		parser.readToken()
 	}
-	if parser.curTok.ID != token.SEMICOLON {
-		msg := fmt.Sprintf("expected ';' instead found '%s'", parser.curTok.Literal)
+	if isSemicolonOrNewline(parser.curTok.ID) == false {
+		msg := fmt.Sprintf("expected ';' or '\n' instead found '%s'", parser.curTok.Literal)
 		return parser.syntaxError(msg)
 	}
 	parser.readToken()
@@ -177,8 +181,8 @@ func (parser *Parser) parseInclude() error {
 	pattern := parser.curTok.Literal
 
 	parser.readToken()
-	if parser.curTok.ID != token.SEMICOLON {
-		msg := fmt.Sprintf("expected ';' instead found '%s'", parser.curTok.Literal)
+	if isSemicolonOrNewline(parser.curTok.ID) == false {
+		msg := fmt.Sprintf("expected ';' or '\n' instead found '%s'", parser.curTok.Literal)
 		return parser.syntaxError(msg)
 	}
 
@@ -260,6 +264,9 @@ func (parser *Parser) parse() error {
 			if err != nil {
 				return err
 			}
+		case token.NEWLINE:
+			// Ignore extra newlines
+			continue
 		default:
 			return parser.syntaxError(fmt.Sprintf("unexpected token %s", tok))
 		}

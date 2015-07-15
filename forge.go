@@ -27,6 +27,7 @@
 //
 //     IDENTIFIER: [_a-zA-Z]+
 //     NUMBERS: [0-9]+
+//     END: ';' | '\n'
 //
 //     BOOL: 'true' | 'false'
 //     NULL: 'null'
@@ -36,10 +37,10 @@
 //     REFERENCE: (IDENTIFIER)? ('.' IDENTIFIER)+
 //     VALUE: BOOL | NULL | INTEGER | FLOAT | STRING | REFERENCE
 //
-//     INCLUDE: 'include ' STRING ';'
-//     DIRECTIVE: (IDENTIFIER '=' VALUE | INCLUDE) ';'
+//     INCLUDE: 'include ' STRING END
+//     DIRECTIVE: (IDENTIFIER '=' VALUE | INCLUDE) END
 //     SECTION: IDENTIFIER '{' (DIRECTIVE | SECTION)* '}'
-//     COMMENT: '#' .* NEWLINE '\n'
+//     COMMENT: '#' .* '\n'
 //
 //     CONFIG_FILE: (COMMENT | DIRECTIVE | SECTION)*
 //
@@ -70,7 +71,7 @@
 //      until after the newline.
 //  * Directive:
 //      A directive is a setting, a identifier and a value. They are in the format '<identifier> = <value>;'
-//      All directives must end in a semicolon. The value can be any of the types defined above.
+//      All directives must end in either a semicolon or newline. The value can be any of the types defined above.
 //  * Section:
 //      A section is a grouping of directives under a common name. They are in the format '<section_name> { <directives> }'.
 //      All sections must be wrapped in brackets ('{', '}') and must all have a name. They do not end in a semicolon.

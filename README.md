@@ -27,11 +27,14 @@ global = "global value";
 primary {
   string = "primary string value";
   single = 'single quotes are allowed too';
-  integer = 500;
-  float = 80.80;
-  boolean = true;
-  negative = FALSE;
-  nothing = NULL;
+
+  # Semicolons are optional
+  integer = 500
+  float = 80.80
+  boolean = true
+  negative = FALSE
+  nothing = NULL
+
   # Include external files
   include "./include*.cfg";
   # Primary-sub section
