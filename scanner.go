@@ -14,10 +14,6 @@ func isLetter(ch rune) bool {
 	return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z')
 }
 
-func isEscapeCharacter(ch rune) bool {
-	return ch == '\\' || ch == '"'
-}
-
 func isDigit(ch rune) bool {
 	return ('0' <= ch && ch <= '9')
 }
@@ -124,11 +120,18 @@ func (scanner *Scanner) parseNumber(negative bool) {
 	}
 }
 
-func (scanner *Scanner) parseString() {
+func (scanner *Scanner) parseString(delimiter rune) {
 	scanner.curTok.ID = token.STRING
-	scanner.curTok.Literal = string(scanner.curCh)
+	scanner.curTok.Literal = ""
 	// Whether or not we are trying to escape a character
 	escape := false
+
+	// If the first character is an escape
+	if scanner.curCh == '\\' {
+		escape = true
+	} else {
+		scanner.curTok.Literal = string(scanner.curCh)
+	}
 	for {
 		scanner.readRune()
 		if escape == false {
@@ -137,16 +140,18 @@ func (scanner *Scanner) parseString() {
 				// A new backslash
 				escape = true
 				continue
-			} else if scanner.curCh == '"' {
+			} else if scanner.curCh == delimiter {
 				// An unescaped quote, time to bail out
 				break
 			}
-		} else if isEscapeCharacter(scanner.curCh) {
+			// Continue as normal, no escaping necessary
+		} else if scanner.curCh == '\\' || scanner.curCh == delimiter {
 			// A valid escape character, continue as normal
 			escape = false
 		} else {
 			// We had a backslash, but an invalid escape character
 			// TODO: "Unsupported escape character found"
+			break
 		}
 		scanner.curTok.Literal += string(scanner.curCh)
 	}
@@ -204,8 +209,8 @@ func (scanner *Scanner) NextToken() token.Token {
 		switch ch {
 		case '=':
 			scanner.curTok.ID = token.EQUAL
-		case '"':
-			scanner.parseString()
+		case '"', '\'':
+			scanner.parseString(ch)
 		case '{':
 			scanner.curTok.ID = token.LBRACKET
 		case '}':

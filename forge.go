@@ -32,7 +32,7 @@
 //     NULL: 'null'
 //     INTEGER: ('-')? NUMBERS
 //     FLOAT: ('-')? NUMBERS '.' NUMBERS
-//     STRING: '"' .* '"'
+//     STRING: ['"] .* ['"]
 //     REFERENCE: (IDENTIFIER)? ('.' IDENTIFIER)+
 //     VALUE: BOOL | NULL | INTEGER | FLOAT | STRING | REFERENCE
 //
@@ -46,8 +46,8 @@
 //
 // Values
 //  * String:
-//      Any value enclosed in double quotes (single quotes not allowed) (e.g. "string").
-//      Double quotes and backslashes can be escaped with backslashes (e.g. "\"quoted\"" and "\\<--backslash")
+//      Any value enclosed in double or single quotes (e.g. "string" or 'string').
+//      Double quotes, single quotes, and backslashes can be escaped with backslashes (e.g. "\"quoted\"", '\'quoted\'', and "\\<--backslash")
 //  * Integer:
 //      Any number without decimal places (e.g. 500)
 //  * Float:
