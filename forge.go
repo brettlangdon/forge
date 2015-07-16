@@ -14,6 +14,13 @@
 //       secondary_bool = true;
 //       secondary_null = null;
 //
+//       list = [
+//         "any",
+//         'value',
+//         true,
+//         55.5,
+//       ]
+//
 //       # Reference other config value
 //       local_ref = .secondary_null;
 //       global_ref = primary.sub_section.sub_float;
@@ -36,9 +43,10 @@
 //     STRING: ['"] .* ['"]
 //     REFERENCE: (IDENTIFIER)? ('.' IDENTIFIER)+
 //     VALUE: BOOL | NULL | INTEGER | FLOAT | STRING | REFERENCE
+//     LIST: '[' (VALUE | LIST) (',' NEWLINE* (VALUE | LIST))+ ']'
 //
 //     INCLUDE: 'include ' STRING END
-//     DIRECTIVE: (IDENTIFIER '=' VALUE | INCLUDE) END
+//     DIRECTIVE: (IDENTIFIER '=' (VALUE | LIST) | INCLUDE) END
 //     SECTION: IDENTIFIER '{' (DIRECTIVE | SECTION)* '}'
 //     COMMENT: '#' .* '\n'
 //
@@ -57,6 +65,9 @@
 //      The identifiers 'true' or 'false' of any case (e.g. TRUE, True, true, FALSE, False, false)
 //  * Null:
 //      The identifier 'null' of any case (e.g. NULL, Null, null)
+//  * List:
+//      A list value is any number of other values separated by commas and surrounded by brackets.
+//      (e.g. [50.5, 'some', "string", true, false])
 //  * Global reference:
 //      An identifier which may contain periods, the references are resolved from the global
 //      section (e.g. global_value, section.sub_section.value)
@@ -74,7 +85,7 @@
 //      All directives must end in either a semicolon or newline. The value can be any of the types defined above.
 //  * Section:
 //      A section is a grouping of directives under a common name. They are in the format '<section_name> { <directives> }'.
-//      All sections must be wrapped in brackets ('{', '}') and must all have a name. They do not end in a semicolon.
+//      All sections must be wrapped in braces ('{', '}') and must all have a name. They do not end in a semicolon.
 //      Sections may be left empty, they do not have to contain any directives.
 //  * Include:
 //      An include statement tells the config parser to include the contents of another config file where the include

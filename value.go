@@ -21,6 +21,8 @@ const (
 	primativesDnd
 
 	complexStart
+	// LIST ValueType
+	LIST
 	// REFERENCE ValueType
 	REFERENCE
 	// SECTION ValueType
@@ -35,6 +37,7 @@ var valueTypes = [...]string{
 	NULL:    "NULL",
 	STRING:  "STRING",
 
+	LIST:      "LIST",
 	REFERENCE: "REFERENCE",
 	SECTION:   "SECTION",
 }
