@@ -26,6 +26,14 @@ primary {
   not_true = FALSE
   nothing = NULL
 
+  list = [
+       TRUE,
+       FALSE,
+       50.5,
+       "hello",
+       'list',
+  ]
+
   # Reference secondary._under (which hasn't been defined yet)
   sec_ref = secondary._under;
    # Primary-sub stuff
@@ -70,6 +78,15 @@ func assertDirectives(values map[string]interface{}, t *testing.T) {
 	assertEqual(primary["not_true"], false, t)
 	assertEqual(primary["nothing"], nil, t)
 	assertEqual(primary["sec_ref"], int64(50), t)
+
+	// Primary list
+	list := primary["list"].([]interface{})
+	assertEqual(len(list), 5, t)
+	assertEqual(list[0], true, t)
+	assertEqual(list[1], false, t)
+	assertEqual(list[2], float64(50.5), t)
+	assertEqual(list[3], "hello", t)
+	assertEqual(list[4], "list", t)
 
 	// Primary Sub
 	sub := primary["sub"].(map[string]interface{})

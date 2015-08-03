@@ -150,6 +150,21 @@ func (section *Section) GetInteger(name string) (int64, error) {
 	return int64(0), errors.New("could not convert non-primative value to integer")
 }
 
+// GetList will try to get the value stored under name as a List
+// will respond with an error if the value does not exist or is not a List
+func (section *Section) GetList(name string) (*List, error) {
+	value, err := section.Get(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if value.GetType() == LIST {
+		return value.(*List), nil
+	}
+
+	return nil, errors.New("could not fetch value as list")
+}
+
 // GetSection will try to get the value stored under name as a Section
 // will respond with an error if the value does not exist or is not a Section
 func (section *Section) GetSection(name string) (*Section, error) {

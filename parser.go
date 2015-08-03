@@ -77,6 +77,38 @@ func (parser *Parser) readToken() token.Token {
 	return parser.curTok
 }
 
+func (parser *Parser) skipNewlines() {
+	for parser.curTok.ID == token.NEWLINE {
+		parser.readToken()
+	}
+}
+
+func (parser *Parser) parseList() ([]Value, error) {
+	var values []Value
+	for {
+		parser.skipNewlines()
+
+		value, err := parser.parseSettingValue()
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, value)
+
+		if parser.curTok.ID == token.COMMA {
+			parser.readToken()
+		}
+
+		parser.skipNewlines()
+
+		if parser.curTok.ID == token.RBRACKET {
+			parser.readToken()
+			break
+		}
+	}
+
+	return values, nil
+}
+
 func (parser *Parser) parseReference(startingSection *Section, period bool) (Value, error) {
 	name := ""
 	if period == false {
@@ -112,9 +144,8 @@ func (parser *Parser) parseReference(startingSection *Section, period bool) (Val
 	return NewReference(name, startingSection), nil
 }
 
-func (parser *Parser) parseSetting(name string) error {
+func (parser *Parser) parseSettingValue() (Value, error) {
 	var value Value
-	parser.readToken()
 
 	readNext := true
 	switch parser.curTok.ID {
@@ -123,7 +154,7 @@ func (parser *Parser) parseSetting(name string) error {
 	case token.BOOLEAN:
 		boolVal, err := strconv.ParseBool(parser.curTok.Literal)
 		if err != nil {
-			return nil
+			return value, nil
 		}
 		value = NewBoolean(boolVal)
 	case token.NULL:
@@ -131,37 +162,54 @@ func (parser *Parser) parseSetting(name string) error {
 	case token.INTEGER:
 		intVal, err := strconv.ParseInt(parser.curTok.Literal, 10, 64)
 		if err != nil {
-			return err
+			return value, err
 		}
 		value = NewInteger(intVal)
 	case token.FLOAT:
 		floatVal, err := strconv.ParseFloat(parser.curTok.Literal, 64)
 		if err != nil {
-			return err
+			return value, err
 		}
 		value = NewFloat(floatVal)
 	case token.PERIOD:
 		reference, err := parser.parseReference(parser.curSection, true)
 		if err != nil {
-			return err
+			return value, err
 		}
 		value = reference
 		readNext = false
 	case token.IDENTIFIER:
 		reference, err := parser.parseReference(parser.settings, false)
 		if err != nil {
-			return err
+			return value, err
 		}
 		value = reference
 		readNext = false
+	case token.LBRACKET:
+		parser.readToken()
+		listVal, err := parser.parseList()
+		if err != nil {
+			return value, err
+		}
+		value = NewList()
+		value.UpdateValue(listVal)
 	default:
-		return parser.syntaxError(
+		return value, parser.syntaxError(
 			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", parser.curTok.ID),
 		)
 	}
 
 	if readNext {
 		parser.readToken()
+	}
+	return value, nil
+}
+
+func (parser *Parser) parseSetting(name string) error {
+	parser.readToken()
+	value, err := parser.parseSettingValue()
+	if err != nil {
+		return err
 	}
 	if isSemicolonOrNewline(parser.curTok.ID) == false {
 		msg := fmt.Sprintf("expected ';' or '\n' instead found '%s'", parser.curTok.Literal)
@@ -247,7 +295,7 @@ func (parser *Parser) parse() error {
 		case token.INCLUDE:
 			parser.parseInclude()
 		case token.IDENTIFIER:
-			if parser.curTok.ID == token.LBRACKET {
+			if parser.curTok.ID == token.LBRACE {
 				err := parser.parseSection(tok.Literal)
 				if err != nil {
 					return err
@@ -259,7 +307,7 @@ func (parser *Parser) parse() error {
 					return err
 				}
 			}
-		case token.RBRACKET:
+		case token.RBRACE:
 			err := parser.endSection()
 			if err != nil {
 				return err

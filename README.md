@@ -35,6 +35,8 @@ primary {
   negative = FALSE
   nothing = NULL
 
+  list = [50.5, true, false, "hello", 'world'];
+
   # Include external files
   include "./include*.cfg";
   # Primary-sub section

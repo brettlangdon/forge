@@ -207,14 +207,20 @@ func (scanner *Scanner) NextToken() token.Token {
 		scanner.readRune()
 		scanner.curTok.Literal = string(ch)
 		switch ch {
+		case ',':
+			scanner.curTok.ID = token.COMMA
 		case '=':
 			scanner.curTok.ID = token.EQUAL
 		case '"', '\'':
 			scanner.parseString(ch)
-		case '{':
+		case '[':
 			scanner.curTok.ID = token.LBRACKET
-		case '}':
+		case ']':
 			scanner.curTok.ID = token.RBRACKET
+		case '{':
+			scanner.curTok.ID = token.LBRACE
+		case '}':
+			scanner.curTok.ID = token.RBRACE
 		case ';':
 			scanner.curTok.ID = token.SEMICOLON
 		case '\n':
