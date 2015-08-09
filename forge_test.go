@@ -19,7 +19,7 @@ primary {
   single_with_quote = '\'hello\' "world"';
 
   # Semicolons are optional
-  integer = 500
+  integer500 = 500
   float = 80.80
   negative = -50
   boolean = true
@@ -71,7 +71,7 @@ func assertDirectives(values map[string]interface{}, t *testing.T) {
 	assertEqual(primary["string_with_quote"], "some \"quoted\" str\\ing", t)
 	assertEqual(primary["single"], "hello world", t)
 	assertEqual(primary["single_with_quote"], "'hello' \"world\"", t)
-	assertEqual(primary["integer"], int64(500), t)
+	assertEqual(primary["integer500"], int64(500), t)
 	assertEqual(primary["float"], float64(80.80), t)
 	assertEqual(primary["negative"], int64(-50), t)
 	assertEqual(primary["boolean"], true, t)

@@ -85,7 +85,7 @@ func (scanner *Scanner) parseIdentifier() {
 	scanner.curTok.Literal = string(scanner.curCh)
 	for {
 		scanner.readRune()
-		if !isLetter(scanner.curCh) && scanner.curCh != '_' {
+		if !isLetter(scanner.curCh) && !isDigit(scanner.curCh) && scanner.curCh != '_' {
 			break
 		}
 		scanner.curTok.Literal += string(scanner.curCh)

@@ -32,7 +32,7 @@
 //
 // Config file format:
 //
-//     IDENTIFIER: [_a-zA-Z]+
+//     IDENTIFIER: [_a-zA-Z]([_a-zA-Z0-9]+)?
 //     NUMBERS: [0-9]+
 //     END: ';' | '\n'
 //
