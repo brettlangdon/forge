@@ -123,6 +123,10 @@ func (scanner *Scanner) parseNumber(negative bool) {
 func (scanner *Scanner) parseString(delimiter rune) {
 	scanner.curTok.ID = token.STRING
 	scanner.curTok.Literal = ""
+	if scanner.curCh == delimiter {
+		scanner.readRune()
+		return
+	}
 	// Whether or not we are trying to escape a character
 	escape := false
 
