@@ -193,6 +193,7 @@ func (parser *Parser) parseSettingValue() (Value, error) {
 		}
 		value = NewList()
 		value.UpdateValue(listVal)
+		readNext = false
 	default:
 		return value, parser.syntaxError(
 			fmt.Sprintf("expected STRING, INTEGER, FLOAT, BOOLEAN or IDENTIFIER, instead found %s", parser.curTok.ID),
