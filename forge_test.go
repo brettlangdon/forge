@@ -42,6 +42,13 @@ primary {
       key = "primary sub key value";
       include "./test_include.cfg";
   }
+
+  sub_section {
+      # Testing of a special case that had previous caused failures
+      # Was caused by an array with no ending semicolon, followed directly by another setting
+      nested_array_no_semi_colon = ["a", "b"]
+      another = true
+  }
 }
 
 secondary {
