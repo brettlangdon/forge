@@ -309,6 +309,44 @@ func (section *Section) Resolve(name string) (Value, error) {
 	return current, nil
 }
 
+// Merge merges the given section to current section. Settings from source
+// section overwites the values in the current section
+func (section *Section) Merge(source *Section) error {
+	for _, key := range source.Keys() {
+		sourceValue, _ := source.Get(key)
+		targetValue, err := section.Get(key)
+
+		// not found, so add it
+		if err != nil {
+			section.Set(key, sourceValue)
+			continue
+		}
+
+		// found existing one and it's type SECTION, merge it
+		if targetValue.GetType() == SECTION {
+			// Source value have to be SECTION type here
+			if sourceValue.GetType() != SECTION {
+				return fmt.Errorf("source (%v) and target (%v) type doesn't match: %v",
+					sourceValue.GetType(),
+					targetValue.GetType(),
+					key)
+			}
+
+			if err = targetValue.(*Section).Merge(sourceValue.(*Section)); err != nil {
+				return err
+			}
+
+			continue
+		}
+
+		// found existing one, update it
+		if err = targetValue.UpdateValue(sourceValue.GetValue()); err != nil {
+			return fmt.Errorf("%v: %v", err, key)
+		}
+	}
+	return nil
+}
+
 // ToJSON will convert this Section and all it's underlying values and Sections
 // into JSON as a []byte
 func (section *Section) ToJSON() ([]byte, error) {
