@@ -35,40 +35,40 @@ func TestSectionKeys(t *testing.T) {
 
 func TestMergeSection(t *testing.T) {
 	config1Str := `
-	global = "global value";
+global = "global value";
 
-	prod {
-	  value = "string value";
-		integer = 500
-	  float = 80.80
-	  boolean = true
-	  negative = FALSE
-	  nothing = NULL
-	}
+prod {
+	value = "string value";
+	integer = 500
+	float = 80.80
+	boolean = true
+	negative = FALSE
+	nothing = NULL
+}
 	`
 
 	config2Str := `
+integer = 500
+float = 80.80
+boolean = true
+negative = FALSE
+nothing = NULL
+
+new_section {
 	integer = 500
-  float = 80.80
-  boolean = true
-  negative = FALSE
-  nothing = NULL
+	float = 80.80
+	boolean = true
+	negative = FALSE
+	nothing = NULL
+}
 
-	new_section {
-		integer = 500
-	  float = 80.80
-	  boolean = true
-	  negative = FALSE
-	  nothing = NULL
-	}
-
-	prod {
-	  value = "new value";
-	  secret = "shhh";
-		nothing = "value"
-		negative = false
-		boolean = false
-	}
+prod {
+	value = "new value";
+	secret = "shhh";
+	nothing = "value"
+	negative = false
+	boolean = false
+}
 	`
 
 	config1, err := forge.ParseString(config1Str)
@@ -116,22 +116,22 @@ func TestMergeSection(t *testing.T) {
 
 func TestMergeSectionFailSectionToField(t *testing.T) {
 	config1Str := `
-	global = "global value";
+global = "global value";
 
-	prod {
-	  value = "string value";
-		integer = 500
-	  float = 80.80
-	  boolean = true
-	  negative = FALSE
-	  nothing = NULL
-	}
+prod {
+	value = "string value";
+	integer = 500
+	float = 80.80
+	boolean = true
+	negative = FALSE
+	nothing = NULL
+}
 	`
 
 	config2Str := `
-	global = "global value";
+global = "global value";
 
-	prod = "I'm prod value"
+prod = "I'm prod value"
 	`
 
 	config1, err := forge.ParseString(config1Str)
