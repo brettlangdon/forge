@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+var (
+	// ErrNotExists represents a nonexistent value error
+	ErrNotExists = errors.New("value does not exist")
+)
+
 // Section struct holds a map of values
 type Section struct {
 	comments []string
@@ -95,7 +100,7 @@ func (section *Section) Get(name string) (Value, error) {
 	value, ok := section.values[name]
 	var err error
 	if ok == false {
-		err = errors.New("value does not exist")
+		err = ErrNotExists
 	}
 	return value, err
 }
