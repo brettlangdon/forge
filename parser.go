@@ -246,7 +246,6 @@ func (parser *Parser) parseInclude() error {
 			continue
 		}
 		reader, err := os.Open(filename)
-		defer reader.Close()
 		if err != nil {
 			return err
 		}
