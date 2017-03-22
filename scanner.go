@@ -167,7 +167,7 @@ func (scanner *Scanner) parseComment() {
 	scanner.curTok.Literal = ""
 	for {
 		scanner.readRune()
-		if scanner.curCh == '\n' {
+		if scanner.curCh == '\n' || scanner.curCh == eof {
 			break
 		}
 		scanner.curTok.Literal += string(scanner.curCh)
